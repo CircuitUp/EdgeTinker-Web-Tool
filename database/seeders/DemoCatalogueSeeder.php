@@ -92,8 +92,13 @@ class DemoCatalogueSeeder extends Seeder
     {
         foreach ($this->products() as $i => $row) {
             $slug = Str::slug($row['name']);
-            $path = "placeholders/product-$slug.svg";
-            File::put(public_path($path), PlaceholderArt::product($row['name'], $row['sku'], $i));
+            // Three placeholder views per product so the gallery has something to switch between.
+            $views = ['Front view', 'Angled view', 'Alternate view'];
+            $paths = [];
+            foreach ($views as $view => $caption) {
+                $paths[$view] = "placeholders/product-$slug".($view === 0 ? '' : '-'.($view + 1)).'.svg';
+                File::put(public_path($paths[$view]), PlaceholderArt::product($row['name'], $row['sku'], $i, $view));
+            }
 
             $product = Product::updateOrCreate(
                 ['sku' => $row['sku']],
@@ -114,12 +119,14 @@ class DemoCatalogueSeeder extends Seeder
             );
 
             $product->images()->delete();
-            $product->images()->create([
-                'path' => $path,
-                'alt' => $row['name'].' (placeholder image)',
-                'is_thumbnail' => true,
-                'sort_order' => 1,
-            ]);
+            foreach ($paths as $view => $path) {
+                $product->images()->create([
+                    'path' => $path,
+                    'alt' => $row['name'].', '.strtolower($views[$view]).' (placeholder image)',
+                    'is_thumbnail' => $view === 0,
+                    'sort_order' => $view + 1,
+                ]);
+            }
 
             $product->specs()->delete();
             $order = 0;

@@ -190,6 +190,107 @@
 }
 
 @layer components {
+    /* Rich text written in Content Studio (product descriptions, page copy).
+       The HTML is sanitised and carries no classes, so it is styled by element. */
+    .rich-text {
+        color: var(--et-neutral-700);
+        font-size: 1rem;
+        line-height: 1.75rem;
+        max-width: 70ch;
+    }
+
+    .rich-text > * + * {
+        margin-top: 1rem;
+    }
+
+    .rich-text h2,
+    .rich-text h3,
+    .rich-text h4 {
+        color: var(--et-neutral-900);
+        font-weight: 600;
+        margin-top: 2rem;
+    }
+
+    .rich-text h2 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+    }
+
+    .rich-text h3 {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+    }
+
+    .rich-text h4 {
+        font-size: 1.125rem;
+    }
+
+    .rich-text a {
+        color: var(--et-primary-600);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .rich-text a:hover {
+        color: var(--et-primary-700);
+    }
+
+    .rich-text ul,
+    .rich-text ol {
+        padding-left: 1.5rem;
+    }
+
+    .rich-text ul {
+        list-style: disc;
+    }
+
+    .rich-text ol {
+        list-style: decimal;
+    }
+
+    .rich-text li + li {
+        margin-top: 0.25rem;
+    }
+
+    .rich-text strong {
+        color: var(--et-neutral-900);
+        font-weight: 600;
+    }
+
+    .rich-text code {
+        background: var(--et-neutral-100);
+        border-radius: var(--et-radius-control);
+        font-family: var(--et-font-mono);
+        font-size: 0.875rem;
+        padding: 0.125rem 0.375rem;
+    }
+
+    .rich-text img {
+        border-radius: var(--et-radius-card);
+        height: auto;
+        max-width: 100%;
+    }
+
+    .rich-text table {
+        border-collapse: collapse;
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .rich-text th,
+    .rich-text td {
+        border: 1px solid var(--et-neutral-200);
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+    }
+
+    .rich-text th {
+        background: var(--et-neutral-50);
+        color: var(--et-neutral-900);
+        font-weight: 600;
+    }
+
     /* Page gutter + max width used by every section. */
     .container-page {
         width: 100%;

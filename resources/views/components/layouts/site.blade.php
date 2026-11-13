@@ -3,7 +3,12 @@
      Extra <head> tags (Open Graph, structured data) go in <x-slot:head>. --}}
 @php
     $siteName = setting('site.name');
-    $fullTitle = $title ? "$title | $siteName" : $siteName.' – '.setting('site.tagline');
+    // Custom SEO titles may already include the site name; do not append it twice.
+    $fullTitle = match (true) {
+        ! $title => $siteName.' – '.setting('site.tagline'),
+        str_contains($title, $siteName) => $title,
+        default => "$title | $siteName",
+    };
     $metaDescription = $description ?? setting('site.tagline');
 @endphp
 <!DOCTYPE html>

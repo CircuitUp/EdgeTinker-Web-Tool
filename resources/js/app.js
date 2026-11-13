@@ -5,6 +5,7 @@ import collapse from '@alpinejs/collapse';
 import megaMenu from './components/mega-menu';
 import slideshow from './components/slideshow';
 import tabs from './components/tabs';
+import gallery from './components/gallery';
 
 Alpine.plugin(focus);
 Alpine.plugin(collapse);
@@ -12,6 +13,7 @@ Alpine.plugin(collapse);
 Alpine.data('megaMenu', megaMenu);
 Alpine.data('slideshow', slideshow);
 Alpine.data('tabs', tabs);
+Alpine.data('gallery', gallery);
 
 /**
  * Toasts. Anywhere in the page:

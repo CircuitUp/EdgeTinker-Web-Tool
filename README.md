@@ -11,7 +11,7 @@ One Laravel application with three parts:
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Project setup, design system, `/styleguide`, header, footer, mega menu, home page | Done |
-| 2 | Products: categories, product page, search and filters | Not started |
+| 2 | Products: categories, product page, search and filters | Product page done; listings, search and filters not started |
 | 3 | Content Studio: authentication, roles, approval workflow | Not started |
 | 4 | Page editing, Services, Contact, wiki | Not started |
 | 5 | Hardening, tests, SEO, performance, Hostinger deployment guide | Not started |
@@ -91,6 +91,7 @@ server never needs Node.js.
 | URL | What |
 |---|---|
 | `/` | Home page |
+| `/product/edgecore-esp32-s3-dev-board` | A sample product page (every demo product has one; open any card on the home page) |
 | `/styleguide` | Every design token and component (local and staging only; not registered in production) |
 
 ## Tests

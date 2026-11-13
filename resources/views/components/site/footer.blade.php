@@ -65,9 +65,9 @@
                 <li class="flex gap-3">
                     <x-icon name="mail" class="mt-0.5 text-primary-300" />
                     @if ($emailIsReal)
-                        <a href="mailto:{{ $email }}" class="break-all underline-offset-4 hover:text-white hover:underline">{{ $email }}</a>
+                        <a href="mailto:{{ $email }}" class="min-w-0 [overflow-wrap:anywhere] underline-offset-4 hover:text-white hover:underline">{{ $email }}</a>
                     @else
-                        <span class="break-all">{{ $email }}</span>
+                        <span class="min-w-0 [overflow-wrap:anywhere]">{{ $email }}</span>
                     @endif
                 </li>
                 <li class="flex gap-3">
