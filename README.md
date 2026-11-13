@@ -11,7 +11,7 @@ One Laravel application with three parts:
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Project setup, design system, `/styleguide`, header, footer, mega menu, home page | Done |
-| 2 | Products: categories, product page, search and filters | Product page done; listings, search and filters not started |
+| 2 | Products: categories, product page, search and filters, currency toggle | Done |
 | 3 | Content Studio: authentication, roles, approval workflow | Not started |
 | 4 | Page editing, Services, Contact, wiki | Not started |
 | 5 | Hardening, tests, SEO, performance, Hostinger deployment guide | Not started |
@@ -91,7 +91,10 @@ server never needs Node.js.
 | URL | What |
 |---|---|
 | `/` | Home page |
-| `/product/edgecore-esp32-s3-dev-board` | A sample product page (every demo product has one; open any card on the home page) |
+| `/products` | All products, with filters and sorting |
+| `/products/sensor-boards` | One category |
+| `/search?q=esp32` | Search results (try `esp23` for the "Did you mean" suggestion) |
+| `/product/edgecore-esp32-s3-dev-board` | A product page |
 | `/styleguide` | Every design token and component (local and staging only; not registered in production) |
 
 ## Tests
@@ -100,8 +103,30 @@ server never needs Node.js.
 php artisan test
 ```
 
-Most tests use an in-memory SQLite database. Search tests (Phase 2) run against the
-`edgetinker_test` MySQL database.
+Most tests use an in-memory SQLite database. Search tests (`tests/Feature/Search`) run against
+the `edgetinker_test` MySQL database, because search depends on FULLTEXT indexes; MySQL must be
+running or those tests are skipped. If your MySQL login differs from `root` with no password,
+set `TEST_DB_HOST`, `TEST_DB_PORT`, `TEST_DB_DATABASE`, `TEST_DB_USERNAME` and `TEST_DB_PASSWORD`.
+
+## How search works
+
+All search goes through the `App\Search\ProductSearch` interface. The current implementation,
+`MySqlProductSearch`, uses the MySQL FULLTEXT index plus `LIKE` matching:
+
+- Every word of the search must match the product name, SKU, descriptions, a tag or the category name.
+  Partial names and SKU fragments match.
+- Name matches rank first, then SKU, tags and description text.
+- If nothing matches, it broadens the match (any word, trimmed word endings) so a typo such as
+  "convertor" still finds "converter".
+- If there are fewer than three matches, it looks for a "Did you mean …?" correction among the
+  words used in product names, SKUs, tags and categories.
+
+To move to a dedicated search engine later, write another class that implements `ProductSearch`
+and change the binding in `app/Providers/AppServiceProvider.php`.
+
+Filters live in the URL so results can be shared:
+`?q=…&category=…&tags=usb-c,wi-fi&min=5&max=20&in_stock=1&sort=price_asc`.
+Selecting several tags narrows the results (a product must have all of them).
 
 ## Where things are
 
@@ -113,7 +138,8 @@ Most tests use an in-memory SQLite database. Search tests (Phase 2) run against 
 | `resources/js/components` | Alpine.js behaviour: mega menu, slideshow, tabs |
 | `lang/en/site.php` | All public interface text, ready for translation |
 | `config/edgetinker.php` | Default site settings (placeholder contact details) |
-| `app/Support` | Currency (USD/LKR), Settings, placeholder artwork generator |
+| `app/Support` | Currency (USD/LKR), Settings, rich-text sanitiser, placeholder artwork generator |
+| `app/Search` | Search interface, MySQL implementation, URL filter object |
 | `database/seeders` | Demo data. All demo products and images are placeholders. |
 
 ## Demo data

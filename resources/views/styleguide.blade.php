@@ -49,7 +49,7 @@
     ];
     $icons = ['search', 'menu', 'x', 'chevron-down', 'chevron-right', 'chevron-left', 'arrow-right', 'external', 'mail', 'phone', 'map-pin',
         'cpu', 'layers', 'code', 'box', 'monitor', 'smartphone', 'check', 'pause', 'play', 'info', 'alert', 'check-circle', 'x-circle',
-        'inbox', 'book', 'linkedin', 'github', 'youtube', 'facebook'];
+        'inbox', 'filter', 'book', 'linkedin', 'github', 'youtube', 'facebook'];
     $h2 = 'text-2xl font-bold tracking-tight text-neutral-900';
     $h3 = 'mt-8 text-lg font-semibold text-neutral-900';
     $note = 'mt-1 text-base text-neutral-600';

@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\StockStatus;
+use App\Search\MySqlProductSearch;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Cache;
 
 class Product extends Model
 {
@@ -17,6 +19,13 @@ class Product extends Model
         'key_features', 'price_usd', 'price_lkr', 'stock_status', 'is_featured',
         'seo_title', 'seo_description',
     ];
+
+    protected static function booted(): void
+    {
+        // Search keeps a cached word list for "Did you mean" suggestions; refresh it when products change.
+        static::saved(fn () => Cache::forget(MySqlProductSearch::VOCABULARY_CACHE_KEY));
+        static::deleted(fn () => Cache::forget(MySqlProductSearch::VOCABULARY_CACHE_KEY));
+    }
 
     protected function casts(): array
     {

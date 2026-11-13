@@ -6,6 +6,9 @@ import megaMenu from './components/mega-menu';
 import slideshow from './components/slideshow';
 import tabs from './components/tabs';
 import gallery from './components/gallery';
+import priceRange from './components/price-range';
+import filterPanel from './components/filter-panel';
+import searchBox from './components/search-box';
 
 Alpine.plugin(focus);
 Alpine.plugin(collapse);
@@ -14,6 +17,9 @@ Alpine.data('megaMenu', megaMenu);
 Alpine.data('slideshow', slideshow);
 Alpine.data('tabs', tabs);
 Alpine.data('gallery', gallery);
+Alpine.data('priceRange', priceRange);
+Alpine.data('filterPanel', filterPanel);
+Alpine.data('searchBox', searchBox);
 
 /**
  * Toasts. Anywhere in the page:

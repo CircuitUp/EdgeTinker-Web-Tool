@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Search\MySqlProductSearch;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,6 +19,8 @@ class Category extends Model
         // The header mega menu and footer read a cached list; keep it fresh.
         static::saved(fn () => Cache::forget(self::NAV_CACHE_KEY));
         static::deleted(fn () => Cache::forget(self::NAV_CACHE_KEY));
+        static::saved(fn () => Cache::forget(MySqlProductSearch::VOCABULARY_CACHE_KEY));
+        static::deleted(fn () => Cache::forget(MySqlProductSearch::VOCABULARY_CACHE_KEY));
     }
 
     public function products(): HasMany
