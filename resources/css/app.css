@@ -1,0 +1,212 @@
+/* Self-hosted fonts (bundled into public/build by Vite; no external font CDN). */
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+
+@import 'tailwindcss';
+
+@source '../views';
+@source '../../app';
+@source '../../storage/framework/views/*.php';
+
+/* ==========================================================================
+   EdgeTinker design tokens
+   Every token is defined ONCE here as a CSS variable, then mapped into the
+   Tailwind theme below. Change a value here and it changes everywhere.
+   ========================================================================== */
+:root {
+    /* Primary (purple). 600, 700, 900, 100 and 50 are the approved values;
+       200–500 and 800 are evenly spaced between them. */
+    --et-primary-50: #f5f3ff;
+    --et-primary-100: #ede9fe;
+    --et-primary-200: #ddd6fe;
+    --et-primary-300: #c4b5fd;
+    --et-primary-400: #a78bfa;
+    --et-primary-500: #8b5cf6;
+    --et-primary-600: #6d28d9;
+    --et-primary-700: #5b21b6;
+    --et-primary-800: #451a8e;
+    --et-primary-900: #2e1065;
+
+    /* Accent: sparing highlights only, never body text on white. */
+    --et-accent: #f59e0b;
+
+    /* Neutrals. 900, 600, 200 and 50 are the approved values. */
+    --et-neutral-50: #f8fafc;
+    --et-neutral-100: #f1f5f9;
+    --et-neutral-200: #e2e8f0;
+    --et-neutral-300: #cbd5e1;
+    --et-neutral-400: #94a3b8;
+    --et-neutral-500: #64748b;
+    --et-neutral-600: #475569;
+    --et-neutral-700: #334155;
+    --et-neutral-800: #1e293b;
+    --et-neutral-900: #0f172a;
+
+    /* Status. The -50 tints are badge and alert backgrounds. */
+    --et-success: #15803d;
+    --et-success-50: #f0fdf4;
+    --et-warning: #b45309;
+    --et-warning-50: #fffbeb;
+    --et-danger: #b91c1c;
+    --et-danger-50: #fef2f2;
+    --et-info: var(--et-primary-600);
+    --et-info-50: var(--et-primary-50);
+
+    /* Radius */
+    --et-radius-control: 6px; /* inputs, buttons */
+    --et-radius-card: 10px; /* cards */
+    --et-radius-panel: 16px; /* panels, modals */
+
+    /* Shadow: two levels */
+    --et-shadow-card: 0 1px 2px rgb(15 23 42 / 0.06), 0 2px 8px rgb(15 23 42 / 0.06);
+    --et-shadow-overlay: 0 10px 20px rgb(15 23 42 / 0.12), 0 24px 48px rgb(15 23 42 / 0.16);
+
+    /* Type */
+    --et-font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    --et-font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, 'Liberation Mono', monospace;
+}
+
+@theme inline {
+    /* Remove Tailwind's default palette, type scale, radii and shadows so that
+       only design-system tokens can be used in templates. */
+    --color-*: initial;
+    --text-*: initial;
+    --radius-*: initial;
+    --shadow-*: initial;
+
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-transparent: transparent;
+    --color-current: currentColor;
+
+    --color-primary-50: var(--et-primary-50);
+    --color-primary-100: var(--et-primary-100);
+    --color-primary-200: var(--et-primary-200);
+    --color-primary-300: var(--et-primary-300);
+    --color-primary-400: var(--et-primary-400);
+    --color-primary-500: var(--et-primary-500);
+    --color-primary-600: var(--et-primary-600);
+    --color-primary-700: var(--et-primary-700);
+    --color-primary-800: var(--et-primary-800);
+    --color-primary-900: var(--et-primary-900);
+
+    --color-accent: var(--et-accent);
+
+    --color-neutral-50: var(--et-neutral-50);
+    --color-neutral-100: var(--et-neutral-100);
+    --color-neutral-200: var(--et-neutral-200);
+    --color-neutral-300: var(--et-neutral-300);
+    --color-neutral-400: var(--et-neutral-400);
+    --color-neutral-500: var(--et-neutral-500);
+    --color-neutral-600: var(--et-neutral-600);
+    --color-neutral-700: var(--et-neutral-700);
+    --color-neutral-800: var(--et-neutral-800);
+    --color-neutral-900: var(--et-neutral-900);
+
+    --color-success: var(--et-success);
+    --color-success-50: var(--et-success-50);
+    --color-warning: var(--et-warning);
+    --color-warning-50: var(--et-warning-50);
+    --color-danger: var(--et-danger);
+    --color-danger-50: var(--et-danger-50);
+    --color-info: var(--et-info);
+    --color-info-50: var(--et-info-50);
+
+    /* Type scale: 14, 16, 18, 20, 24, 30, 36, 48 px */
+    --text-sm: 0.875rem;
+    --text-sm--line-height: 1.25rem;
+    --text-base: 1rem;
+    --text-base--line-height: 1.5rem;
+    --text-lg: 1.125rem;
+    --text-lg--line-height: 1.75rem;
+    --text-xl: 1.25rem;
+    --text-xl--line-height: 1.75rem;
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: 2rem;
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: 2.25rem;
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: 2.5rem;
+    --text-5xl: 3rem;
+    --text-5xl--line-height: 1.1;
+
+    --font-sans: var(--et-font-sans);
+    --font-mono: var(--et-font-mono);
+
+    /* Spacing: 4 px base (Tailwind's default `--spacing: 0.25rem`). */
+    --spacing: 0.25rem;
+
+    --radius-control: var(--et-radius-control);
+    --radius-card: var(--et-radius-card);
+    --radius-panel: var(--et-radius-panel);
+
+    --shadow-card: var(--et-shadow-card);
+    --shadow-overlay: var(--et-shadow-overlay);
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        font-family: var(--et-font-sans);
+        color: var(--et-neutral-900);
+        background-color: #ffffff;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* One visible focus style for every interactive element (WCAG 2.4.7). */
+    :focus-visible {
+        outline: 2px solid var(--et-primary-600);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    /* On dark surfaces the purple ring is invisible; use the light tint. */
+    .on-dark :focus-visible,
+    .on-dark:focus-visible {
+        outline-color: #ffffff;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+@layer components {
+    /* Page gutter + max width used by every section. */
+    .container-page {
+        width: 100%;
+        max-width: 80rem;
+        margin-inline: auto;
+        padding-inline: 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .container-page {
+            padding-inline: 1.5rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .container-page {
+            padding-inline: 2rem;
+        }
+    }
+}
