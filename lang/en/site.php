@@ -89,7 +89,8 @@ return [
     'product' => [
         'price_on_request' => 'Price on request',
         'sku' => 'SKU',
-        'enquire' => 'Enquire / Where to buy',
+        'buy' => 'Buy',
+        'send_inquiry' => 'Send Inquiry',
         'enquiry_subject' => 'Enquiry: :name (:sku)',
         'price_note' => 'Price shown in :currency. Use the toggle in the header to switch.',
         'at_a_glance' => 'At a glance',
@@ -138,6 +139,7 @@ return [
         'services_cta' => 'Explore our services',
         'contact_cta' => 'Contact us',
         'contact_secondary' => 'Read the wiki',
+        'partners_pause' => 'Pause the moving partner logos',
     ],
 
     'services' => [

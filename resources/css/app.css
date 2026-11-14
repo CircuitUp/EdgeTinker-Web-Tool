@@ -335,6 +335,79 @@
         margin-right: 0.5rem;
     }
 
+    /* ── Partner logos: a strip that moves continuously from right to left ──
+       The track holds two identical groups. Sliding it left by half its width
+       (one group) and repeating is seamless. */
+    .logo-marquee {
+        overflow: hidden;
+        /* Fade the logos in and out at the edges. */
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+        mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    }
+
+    .logo-marquee-track {
+        animation: logo-marquee var(--marquee-duration, 40s) linear infinite;
+        display: flex;
+        width: max-content;
+    }
+
+    /* Pause while the pointer is over it, and when the visitor presses the pause button. */
+    .logo-marquee:hover .logo-marquee-track,
+    .logo-marquee.is-paused .logo-marquee-track {
+        animation-play-state: paused;
+    }
+
+    .logo-marquee-group {
+        align-items: center;
+        display: flex;
+        flex-shrink: 0;
+        gap: 3.5rem;
+        padding-right: 3.5rem;
+    }
+
+    .logo-marquee-group img {
+        height: 3rem;
+        max-width: 11rem;
+        object-fit: contain;
+        width: auto;
+    }
+
+    @keyframes logo-marquee {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    /* Reduced motion: no movement. Show each logo once, in a centred, wrapping row. */
+    @media (prefers-reduced-motion: reduce) {
+        .logo-marquee {
+            -webkit-mask-image: none;
+            mask-image: none;
+        }
+
+        .logo-marquee-track {
+            animation: none;
+            justify-content: center;
+            width: auto;
+        }
+
+        .logo-marquee-group {
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0 1rem;
+            row-gap: 1.5rem;
+        }
+
+        .logo-marquee-group[aria-hidden='true'],
+        .logo-marquee-group li[aria-hidden='true'] {
+            display: none;
+        }
+    }
+
     /* Two-handle price slider: two native range inputs stacked on one track.
        The inputs ignore the pointer; only their thumbs take it, so both stay reachable. */
     .range-dual {

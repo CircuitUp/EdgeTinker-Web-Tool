@@ -61,7 +61,45 @@ class ProductPageTest extends TestCase
             ->assertSee('Front of the board')
             ->assertSee('Sensor Boards')
             ->assertSee(route('search', ['tags' => 'i2c']), false)
-            ->assertSee(__('site.product.enquire'));
+            ->assertSee(__('site.product.send_inquiry'));
+    }
+
+    public function test_in_stock_product_with_a_store_link_shows_buy_opening_the_store_in_a_new_tab(): void
+    {
+        foreach (['in_stock', 'low_stock'] as $status) {
+            $this->product(['slug' => "buyable-$status", 'stock_status' => $status, 'store_url' => 'https://store.example.com/item?id=5&ref=site']);
+
+            $html = $this->get("/product/buyable-$status")->assertOk()->getContent();
+
+            $this->assertMatchesRegularExpression(
+                '#<a href="https://store\.example\.com/item\?id=5&amp;ref=site"[^>]*target="_blank"[^>]*rel="noopener"[^>]*>\s*Buy\b#',
+                $html, "A $status product with a store link must show Buy.",
+            );
+            $this->assertStringNotContainsString('Send Inquiry', $html);
+        }
+    }
+
+    public function test_unavailable_products_show_send_inquiry_leading_to_the_contact_page(): void
+    {
+        foreach (['out_of_stock', 'coming_soon'] as $status) {
+            $this->product(['name' => 'Waiting Board', 'sku' => "ET-W-$status", 'slug' => "waiting-$status", 'stock_status' => $status,
+                'store_url' => 'https://store.example.com/item']);
+
+            $response = $this->get("/product/waiting-$status")->assertOk();
+
+            $response->assertSee('Send Inquiry')
+                ->assertSee(e(route('contact', ['subject' => "Enquiry: Waiting Board (ET-W-$status)"])), false)
+                ->assertDontSee('https://store.example.com/item', false);
+            $this->assertDoesNotMatchRegularExpression('#>\s*Buy\b#', $response->getContent());
+        }
+    }
+
+    public function test_an_in_stock_product_without_a_store_link_falls_back_to_send_inquiry(): void
+    {
+        $this->product(['slug' => 'no-store', 'stock_status' => 'in_stock', 'store_url' => null]);
+
+        $response = $this->get('/product/no-store')->assertOk()->assertSee('Send Inquiry');
+        $this->assertDoesNotMatchRegularExpression('#>\s*Buy\b#', $response->getContent());
     }
 
     public function test_unknown_product_returns_404(): void

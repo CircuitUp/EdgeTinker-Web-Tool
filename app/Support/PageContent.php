@@ -92,6 +92,15 @@ class PageContent
                     ]],
                 ['key' => 'contact_heading', 'group' => 'Contact call-to-action', 'label' => 'Heading', 'type' => 'text', 'required' => true, 'max' => 120],
                 ['key' => 'contact_text', 'group' => 'Contact call-to-action', 'label' => 'Text', 'type' => 'textarea', 'max' => 300],
+                ['key' => 'partners_heading', 'group' => 'Partners', 'label' => 'Heading', 'type' => 'text', 'required' => true, 'max' => 120],
+                ['key' => 'partners', 'group' => 'Partners', 'label' => 'Partner logos', 'type' => 'repeater', 'max_rows' => 30, 'row_label' => 'Partner',
+                    'hint' => 'Shown as a strip of logos just above the footer, moving continuously from right to left. Only the logos are displayed. With no partners, the section is hidden.',
+                    'fields' => [
+                        ['key' => 'name', 'label' => 'Partner name', 'type' => 'text', 'required' => true, 'max' => 80,
+                            'hint' => 'Not shown on the page. It is read out by screen readers in place of the logo.'],
+                        ['key' => 'logo', 'label' => 'Logo', 'type' => 'image', 'required' => true,
+                            'hint' => 'A PNG or WebP with a transparent background works best. It is shown about 48 px high.'],
+                    ]],
             ],
             'services' => [
                 ['key' => 'heading', 'group' => 'Introduction', 'label' => 'Page heading', 'type' => 'text', 'required' => true, 'max' => 120],
@@ -147,6 +156,8 @@ class PageContent
                 ],
                 'contact_heading' => 'Have a project in mind?',
                 'contact_text' => 'Tell us what you are building. We will help you pick the right board or scope a custom design.',
+                'partners_heading' => 'Our partners',
+                'partners' => [],
             ],
             'services' => [
                 'heading' => 'Engineering services',

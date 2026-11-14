@@ -368,6 +368,24 @@ class ApprovalWorkflowTest extends TestCase
 
     // ── Safety of submitted content ──────────────────────────────────────────
 
+    public function test_the_store_link_is_saved_and_must_be_a_safe_https_address(): void
+    {
+        foreach (['javascript:alert(1)', 'http://insecure.example', 'not a link', '//evil.example'] as $bad) {
+            try {
+                $this->revisions->save($this->creator, 'product', null, $this->payload(['store_url' => $bad]), submit: true);
+                $this->fail("The store link “{$bad}” must be refused.");
+            } catch (ValidationException $e) {
+                $this->assertArrayHasKey('store_url', $e->errors());
+            }
+        }
+
+        $revision = $this->revisions->save($this->creator, 'product', null, $this->payload(['store_url' => 'https://shop.example.com/p/1']), submit: true);
+        $this->revisions->approve($revision, $this->admin);
+
+        $this->assertSame('https://shop.example.com/p/1', Product::sole()->store_url);
+        $this->get('/product/new-sensor-board')->assertSee('href="https://shop.example.com/p/1"', false)->assertSee('Buy');
+    }
+
     public function test_unsafe_html_is_removed_before_it_is_stored(): void
     {
         $revision = $this->revisions->save($this->creator, 'product', null, $this->payload([

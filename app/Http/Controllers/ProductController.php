@@ -58,7 +58,8 @@ class ProductController extends Controller
                     'price' => number_format((float) $price, 2, '.', ''),
                     'priceCurrency' => $code,
                     'availability' => $product->stock_status->schemaOrg(),
-                    'url' => route('products.show', $product->slug),
+                    // Where it can actually be bought, when there is a store page for it.
+                    'url' => $product->canBeBought() ? $product->store_url : route('products.show', $product->slug),
                 ];
             }
         }

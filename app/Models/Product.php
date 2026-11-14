@@ -16,7 +16,7 @@ class Product extends Model
 {
     protected $fillable = [
         'category_id', 'name', 'slug', 'sku', 'short_description', 'description',
-        'key_features', 'price_usd', 'price_lkr', 'stock_status', 'is_featured',
+        'key_features', 'price_usd', 'price_lkr', 'stock_status', 'store_url', 'is_featured',
         'seo_title', 'seo_description',
     ];
 
@@ -90,6 +90,15 @@ class Product extends Model
     public function scopeForCard(Builder $query): Builder
     {
         return $query->with(['thumbnail.media', 'category:id,name,slug']);
+    }
+
+    /**
+     * Whether the product page shows "Buy" (opening the store page) rather than
+     * "Send Inquiry". Buying needs both stock (in stock or low stock) and a store link.
+     */
+    public function canBeBought(): bool
+    {
+        return $this->stock_status->isAvailable() && filled($this->store_url);
     }
 
     /** Price in the given currency code, or null when not set ("price on request"). */

@@ -124,6 +124,10 @@ The demo creator is never created in production, and the Content Admin is never 
 
 Screens: Dashboard, Products, Categories, Tags, Pages (Home, Services, Contact), Wiki, Media library, My submissions; and for the admin Review queue, Messages, Users, Audit log, Site settings.
 
+**Product page button.** A product that is in stock (or low stock) and has a **Store link** shows **Buy**, which opens that link in a new tab. Otherwise (out of stock, coming soon, or no store link) it shows **Send Inquiry**, which opens the contact form with the product in the subject. The store link is set on each product's form.
+
+**Partners.** The last section of the home page, just above the footer, is a strip of partner logos moving from right to left. Add, reorder or remove partners in **Pages → Home → Partners**; with none, the section is hidden. It pauses on hover and with its pause button, and stands still for visitors who ask their device for reduced motion.
+
 ## Tests
 
 ```powershell

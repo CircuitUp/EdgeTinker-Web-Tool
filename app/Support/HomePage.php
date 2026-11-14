@@ -28,6 +28,7 @@ class HomePage
             'categories' => Category::navigation(),
             'featured' => self::featured($override === null ? null : ($content['featured_product_ids'] ?? [])),
             'services' => $pages->get('services')['services'],
+            'partners' => self::partners($content['partners'] ?? []),
             'seo' => $override === null ? $pages->seo('home') : ['title' => null, 'description' => null],
         ];
     }
@@ -56,6 +57,35 @@ class HomePage
         }
 
         return $products->sortBy(fn (Product $product) => $order[$product->id] ?? PHP_INT_MAX)->take($limit)->values();
+    }
+
+    /**
+     * Partner logos ready for the template: name (used as the image's text
+     * alternative), src, and the logo's real proportions when known.
+     * Partners whose logo file is missing are left out.
+     *
+     * @return list<array{name: string, src: string, width: int, height: int}>
+     */
+    private static function partners(array $rows): array
+    {
+        $media = Media::whereIn('id', collect($rows)->pluck('logo.media_id')->filter())->get()->keyBy('id');
+        $partners = [];
+
+        foreach ($rows as $row) {
+            $file = ($row['logo']['media_id'] ?? null) ? ($media[$row['logo']['media_id']] ?? null) : null;
+            $src = $file ? $file->variantUrl(400) : media_url($row['logo']['path'] ?? null);
+
+            if (! $src) {
+                continue;
+            }
+
+            // Displayed 48 px high; the width follows the logo's own proportions.
+            $ratio = $file && $file->width && $file->height ? $file->width / $file->height : 10 / 3;
+
+            $partners[] = ['name' => (string) ($row['name'] ?? ''), 'src' => $src, 'width' => (int) round(48 * $ratio), 'height' => 48];
+        }
+
+        return $partners;
     }
 
     /** Unsaved slide models built from a revision payload. */

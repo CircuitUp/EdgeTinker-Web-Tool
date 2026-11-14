@@ -206,4 +206,50 @@
             </div>
         </div>
     </section>
+
+    {{-- 7. Partners -------------------------------------------------------
+         Logos only, moving continuously from right to left, just above the footer.
+         The strip is two identical groups side by side; sliding it left by exactly one
+         group's width and starting again makes the movement seamless (see .logo-marquee in app.css).
+         It pauses while the pointer is over it and with the pause button, and visitors
+         who ask for reduced motion get a still, wrapped row instead. --}}
+    @if (! empty($partners))
+        @php
+            // Repeat a short list so that one group is always wider than the screen.
+            $repeat = (int) max(1, ceil(10 / count($partners)));
+            $perGroup = count($partners) * $repeat;
+        @endphp
+        <section class="border-t border-neutral-200 py-10 sm:py-12" aria-labelledby="home-partners" x-data="{ paused: false }">
+            <div class="container-page flex items-center justify-between gap-4">
+                <h2 id="home-partners" class="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">{{ $content['partners_heading'] }}</h2>
+                <button type="button" @click="paused = ! paused" :aria-pressed="paused ? 'true' : 'false'"
+                        class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-neutral-300 text-neutral-600 hover:border-primary-600 hover:text-primary-700 motion-reduce:hidden">
+                    <span x-show="! paused"><x-icon name="pause" class="h-4 w-4" /></span>
+                    <span x-show="paused" x-cloak><x-icon name="play" class="h-4 w-4" /></span>
+                    <span class="sr-only">{{ __('site.home.partners_pause') }}</span>
+                </button>
+            </div>
+
+            <div class="logo-marquee mt-6" :class="paused && 'is-paused'">
+                <div class="logo-marquee-track" style="--marquee-duration: {{ $perGroup * 4 }}s">
+                    @foreach ([false, true] as $duplicate)
+                        <ul class="logo-marquee-group" @if ($duplicate) aria-hidden="true" @endif>
+                            @for ($round = 0; $round < $repeat; $round++)
+                                @foreach ($partners as $partner)
+                                    {{-- Each partner is announced once; the repeats exist only to fill the strip.
+                                         Not lazy-loaded: logos slide in from the side, where lazy loading would show
+                                         them blank for a moment. They are small, so they load at low priority instead. --}}
+                                    @php $announce = ! $duplicate && $round === 0; @endphp
+                                    <li @if (! $announce && ! $duplicate) aria-hidden="true" @endif>
+                                        <img src="{{ $partner['src'] }}" alt="{{ $announce ? $partner['name'] : '' }}"
+                                             width="{{ $partner['width'] }}" height="{{ $partner['height'] }}" fetchpriority="low" decoding="async">
+                                    </li>
+                                @endforeach
+                            @endfor
+                        </ul>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 </x-layouts.site>

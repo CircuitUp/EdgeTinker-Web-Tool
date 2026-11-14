@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DemoCatalogueSeeder::class,
             DemoWikiSeeder::class,
+            DemoPartnersSeeder::class,
         ]);
 
         SiteCache::flush();

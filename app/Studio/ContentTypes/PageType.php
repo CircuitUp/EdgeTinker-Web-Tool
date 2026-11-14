@@ -105,7 +105,9 @@ class PageType extends ContentType
             'icon' => [$path => [$presence, Rule::in(PageContent::ICONS)]],
             'lines' => [$path => ['array', 'max:'.($field['max_rows'] ?? 20)], "$path.*" => ['string', $max]],
             'image' => [
-                "$path.media_id" => ['nullable', 'integer', Rule::exists('media', 'id')->where('kind', Media::KIND_IMAGE)],
+                // A required image needs either an uploaded file or (for demo content) a placeholder path.
+                "$path.media_id" => [($field['required'] ?? false) ? "required_without:$path.path" : 'nullable', 'nullable', 'integer',
+                    Rule::exists('media', 'id')->where('kind', Media::KIND_IMAGE)],
                 "$path.path" => ['nullable', 'string', 'starts_with:placeholders/', 'not_regex:/\.\./'],
             ],
             'products' => [$path => ['array', 'max:'.($field['max_rows'] ?? 12)], "$path.*" => ['integer', Rule::exists('products', 'id')]],
@@ -121,6 +123,7 @@ class PageType extends ContentType
         return [
             'content.*.*.button_url.regex' => 'The button link must be a page on this site (starting with /) or a full https:// address.',
             'content.slides.min' => 'The slideshow needs at least one slide.',
+            'content.partners.*.logo.media_id.required_without' => 'Upload a logo for this partner.',
             'required' => 'This field is required.',
         ];
     }

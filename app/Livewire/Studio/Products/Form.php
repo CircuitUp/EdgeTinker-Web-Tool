@@ -80,7 +80,7 @@ class Form extends Component
         $this->form += [
             'name' => '', 'slug' => '', 'sku' => '', 'category_id' => null, 'short_description' => '', 'description' => '',
             'key_features' => [''], 'specs' => [['label' => '', 'value' => '']], 'price_usd' => null, 'price_lkr' => null,
-            'stock_status' => StockStatus::InStock->value, 'is_featured' => false, 'images' => [], 'documents' => [],
+            'stock_status' => StockStatus::InStock->value, 'store_url' => '', 'is_featured' => false, 'images' => [], 'documents' => [],
             'tag_ids' => [], 'new_tags' => [], 'seo_title' => '', 'seo_description' => '',
         ];
 

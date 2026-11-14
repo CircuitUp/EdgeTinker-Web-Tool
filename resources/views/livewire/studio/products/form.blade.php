@@ -60,7 +60,10 @@
                     </select>
                 </x-form.field>
 
-                <div class="flex items-end">
+                <x-studio.input label="Store link" model="form.store_url" type="url" mono placeholder="https://store.example.com/your-product"
+                                hint="The page where this product can be bought. When the product is in stock (or low stock), its page shows a “Buy” button that opens this link in a new tab. Out of stock, coming soon, or no link: the button reads “Send Inquiry” and opens the contact form." />
+
+                <div class="flex items-end sm:col-span-2">
                     <label for="f-featured" class="inline-flex min-h-11 cursor-pointer items-center gap-3 text-base text-neutral-900">
                         <input id="f-featured" type="checkbox" wire:model="form.is_featured" class="h-5 w-5 accent-primary-600">
                         <span>Feature this product on the home page</span>

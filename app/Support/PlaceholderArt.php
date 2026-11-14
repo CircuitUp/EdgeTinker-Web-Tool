@@ -109,6 +109,29 @@ SVG;
 SVG;
     }
 
+    /** Wide, transparent partner logo: a simple mark and the words "PARTNER n", labelled as a placeholder. */
+    public static function partnerLogo(int $number): string
+    {
+        $label = self::LABEL;
+        $colour = ['#5B21B6', '#0F172A', '#6D28D9', '#475569', '#451A8E', '#334155'][($number - 1) % 6];
+        $mark = [
+            '<circle cx="48" cy="44" r="26" fill="none" stroke="'.$colour.'" stroke-width="8"/>',
+            '<rect x="22" y="18" width="52" height="52" rx="10" fill="'.$colour.'"/>',
+            '<path d="M48 16 L78 70 H18 Z" fill="'.$colour.'"/>',
+            '<path d="M22 44 H74 M48 18 V70" stroke="'.$colour.'" stroke-width="10" stroke-linecap="round"/>',
+            '<rect x="22" y="18" width="52" height="52" rx="26" fill="none" stroke="'.$colour.'" stroke-width="8"/><circle cx="48" cy="44" r="9" fill="'.$colour.'"/>',
+            '<path d="M22 70 V30 L48 18 L74 30 V70 Z" fill="'.$colour.'"/>',
+        ][($number - 1) % 6];
+
+        return <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" width="320" height="96" role="img" aria-label="Placeholder logo for partner $number">
+  $mark
+  <text x="96" y="52" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="1" fill="$colour">PARTNER $number</text>
+  <text x="97" y="78" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="2" fill="#6D28D9">$label</text>
+</svg>
+SVG;
+    }
+
     /** Deterministic circuit-trace decoration. */
     private static function traces(int $w, int $h, int $seed, string $colour, int $stroke): string
     {

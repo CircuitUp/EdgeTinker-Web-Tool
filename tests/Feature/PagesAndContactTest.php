@@ -197,6 +197,70 @@ class PagesAndContactTest extends TestCase
             ->assertDontSee('First Featured');
     }
 
+    public function test_partners_section_shows_logos_above_the_footer_and_is_hidden_when_empty(): void
+    {
+        $this->get('/')->assertOk()->assertDontSee('id="home-partners"', false);
+
+        $payload = $this->pagePayload('home', [
+            'slides' => [['heading' => 'A slide', 'image' => []]], // the Home page needs at least one
+            'partners_heading' => 'Trusted by',
+            'partners' => [
+                ['name' => 'Acme Robotics', 'logo' => ['path' => 'placeholders/partner-1.svg']],
+                ['name' => 'Globex Power', 'logo' => ['path' => 'placeholders/partner-2.svg']],
+            ],
+        ]);
+        app(RevisionService::class)->save($this->admin, 'page', PageType::idFor('home'), $payload, submit: true);
+
+        $html = $this->get('/')->assertOk()->assertSee('Trusted by')->getContent();
+
+        // Logos only: names appear as image alternatives, never as visible text.
+        $this->assertStringContainsString('alt="Acme Robotics"', $html);
+        $this->assertStringContainsString('alt="Globex Power"', $html);
+        $this->assertStringNotContainsString('>Acme Robotics<', $html);
+        $this->assertSame(1, substr_count($html, 'alt="Acme Robotics"'), 'Each partner is announced to screen readers once.');
+
+        // The strip has two groups (for the seamless loop); the copy is hidden from assistive technology.
+        $this->assertSame(2, substr_count($html, 'class="logo-marquee-group"'));
+        $this->assertMatchesRegularExpression('#class="logo-marquee-group"\s+aria-hidden="true"#', $html);
+
+        // It is the last section, directly before the footer.
+        $partners = strpos($html, 'aria-labelledby="home-partners"');
+        $footer = strpos($html, '<footer');
+        $this->assertNotFalse($partners);
+        $this->assertLessThan($partners, strpos($html, 'id="home-contact"'), 'Partners comes after the contact call-to-action.');
+        $this->assertStringNotContainsString('<section', substr($html, $partners, $footer - $partners), 'No other section sits between Partners and the footer.');
+        $this->assertMatchesRegularExpression('#^</section>\s*</main>\s*$#', substr($html, strrpos(substr($html, 0, $footer), '</section>'), $footer - strrpos(substr($html, 0, $footer), '</section>')));
+    }
+
+    public function test_a_partner_needs_a_logo(): void
+    {
+        $payload = $this->pagePayload('home', ['partners' => [['name' => 'No Logo Ltd', 'logo' => ['media_id' => null, 'path' => null]]]]);
+
+        try {
+            app(RevisionService::class)->save($this->creator, 'page', PageType::idFor('home'), $payload, submit: true);
+            $this->fail('A partner without a logo must be refused.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('content.partners.0.logo.media_id', $e->errors());
+        }
+    }
+
+    public function test_partner_logos_are_uploaded_from_the_home_page_editor(): void
+    {
+        Storage::fake('public');
+        Queue::fake();
+
+        Livewire::actingAs($this->admin)->test(PageForm::class, ['page' => 'home'])
+            ->call('addRow', 'slides')->set('form.content.slides.0.heading', 'A slide') // the Home page needs at least one
+            ->call('addRow', 'partners')
+            ->set('form.content.partners.0.name', 'Initech')
+            ->set('uploads.partners.0.logo', UploadedFile::fake()->image('initech.png', 300, 100))
+            ->assertHasNoErrors()
+            ->call('submit')
+            ->assertHasNoErrors();
+
+        $this->get('/')->assertSee('alt="Initech"', false)->assertSee(Media::sole()->path, false);
+    }
+
     public function test_page_fields_are_validated(): void
     {
         $bad = $this->pagePayload('home', [

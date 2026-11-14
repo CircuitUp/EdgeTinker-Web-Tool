@@ -113,10 +113,19 @@
                     <p class="mt-1 text-sm text-neutral-600">{{ __('site.product.price_note', ['currency' => $currencyCode]) }}</p>
                 @endif
 
+                {{-- In stock with a store link: "Buy" opens the store page in a new tab.
+                     Otherwise (out of stock, coming soon, or no store link yet): "Send Inquiry" opens the contact form. --}}
                 <div class="mt-6">
-                    <x-button :href="$enquireUrl" size="lg" class="w-full sm:w-auto">
-                        <x-icon name="mail" /> {{ __('site.product.enquire') }}
-                    </x-button>
+                    @if ($product->canBeBought())
+                        <x-button :href="$product->store_url" size="lg" class="w-full sm:w-auto" target="_blank" rel="noopener">
+                            {{ __('site.product.buy') }} <x-icon name="external" />
+                            <span class="sr-only">{{ __('site.nav.new_tab') }}</span>
+                        </x-button>
+                    @else
+                        <x-button :href="$enquireUrl" size="lg" class="w-full sm:w-auto">
+                            <x-icon name="mail" /> {{ __('site.product.send_inquiry') }}
+                        </x-button>
+                    @endif
                 </div>
 
                 @if ($product->specs->isNotEmpty())

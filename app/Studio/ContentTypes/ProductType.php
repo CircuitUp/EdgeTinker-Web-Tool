@@ -19,7 +19,7 @@ use Illuminate\Validation\Rule;
  * Payload shape:
  *   name, slug, sku, category_id, short_description, description (HTML),
  *   key_features: string[], specs: [{label, value}],
- *   price_usd, price_lkr, stock_status, is_featured,
+ *   price_usd, price_lkr, stock_status, store_url (external store page), is_featured,
  *   images: [{media_id|null, path|null, alt, is_thumbnail}],
  *   documents: [{media_id, title, type}],
  *   tag_ids: int[], new_tags: string[] (created when the product is approved),
@@ -81,6 +81,7 @@ class ProductType extends ContentType
             'price_usd' => $this->money($payload['price_usd'] ?? null),
             'price_lkr' => $this->money($payload['price_lkr'] ?? null),
             'stock_status' => $this->text($payload['stock_status'] ?? StockStatus::InStock->value, 20),
+            'store_url' => $this->nullableText($payload['store_url'] ?? null, 1000),
             'is_featured' => (bool) ($payload['is_featured'] ?? false),
             'images' => $images,
             'documents' => collect((array) ($payload['documents'] ?? []))
@@ -114,6 +115,8 @@ class ProductType extends ContentType
             'price_usd' => ['nullable', 'numeric', 'min:0', 'max:99999999'],
             'price_lkr' => ['nullable', 'numeric', 'min:0', 'max:9999999999'],
             'stock_status' => ['required', Rule::enum(StockStatus::class)],
+            // The "Buy" button opens this address. https only, so it can never be a javascript: or data: link.
+            'store_url' => ['nullable', 'string', 'max:1000', 'url:https'],
             'is_featured' => ['boolean'],
             'images' => ['array', 'max:12'],
             'images.*.media_id' => ['nullable', 'integer', Rule::exists('media', 'id')->where('kind', Media::KIND_IMAGE)],
@@ -143,6 +146,7 @@ class ProductType extends ContentType
             'specs.*.value.required' => 'Each specification needs a value.',
             'documents.*.title.required' => 'Each document needs a title.',
             'images.*.path.starts_with' => 'Images must be chosen from the media library.',
+            'store_url.url' => 'The store link must be a full address starting with https://',
         ];
     }
 
@@ -151,6 +155,7 @@ class ProductType extends ContentType
         return [
             'category_id' => 'category', 'price_usd' => 'price in USD', 'price_lkr' => 'price in LKR',
             'sku' => 'SKU', 'slug' => 'web address', 'seo_title' => 'SEO title', 'seo_description' => 'SEO description',
+            'store_url' => 'store link',
         ];
     }
 
@@ -179,6 +184,7 @@ class ProductType extends ContentType
             'price_usd' => $product->price_usd,
             'price_lkr' => $product->price_lkr,
             'stock_status' => $product->stock_status->value,
+            'store_url' => $product->store_url,
             'is_featured' => $product->is_featured,
             'images' => $product->images->map(fn (ProductImage $image) => [
                 'media_id' => $image->media_id,
@@ -211,6 +217,7 @@ class ProductType extends ContentType
             'price_usd' => $payload['price_usd'],
             'price_lkr' => $payload['price_lkr'],
             'stock_status' => $payload['stock_status'],
+            'store_url' => $payload['store_url'] ?? null,
             'is_featured' => $payload['is_featured'],
             'seo_title' => $payload['seo_title'],
             'seo_description' => $payload['seo_description'],
@@ -275,6 +282,7 @@ class ProductType extends ContentType
             'Price (USD)' => isset($payload['price_usd']) ? '$'.number_format((float) $payload['price_usd'], 2) : 'Not set',
             'Price (LKR)' => isset($payload['price_lkr']) ? 'Rs '.number_format((float) $payload['price_lkr'], 2) : 'Not set',
             'Stock status' => StockStatus::tryFrom($payload['stock_status'] ?? '')?->label() ?? '',
+            'Store link (Buy button)' => ($payload['store_url'] ?? null) ?: 'Not set',
             'Featured on home page' => ($payload['is_featured'] ?? false) ? 'Yes' : 'No',
             'Images' => collect($payload['images'])->map(fn ($image) => ($image['media_id'] ? ($media[$image['media_id']]->original_name ?? 'Missing file') : basename((string) $image['path']))
                 .($image['is_thumbnail'] ? ' (thumbnail)' : '').' – alt: '.$image['alt'])->all(),
@@ -314,7 +322,7 @@ class ProductType extends ContentType
 
         $product = new Product(collect($payload)->only([
             'name', 'slug', 'sku', 'short_description', 'description', 'key_features', 'price_usd', 'price_lkr',
-            'stock_status', 'is_featured', 'seo_title', 'seo_description',
+            'stock_status', 'store_url', 'is_featured', 'seo_title', 'seo_description',
         ])->all());
         $product->category_id = $payload['category_id'];
 
