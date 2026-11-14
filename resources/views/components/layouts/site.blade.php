@@ -1,4 +1,4 @@
-@props(['title' => null, 'description' => null, 'preview' => false])
+@props(['title' => null, 'description' => null, 'preview' => false, 'ogType' => 'website', 'ogImage' => null])
 {{-- Public site layout: <x-layouts.site title="Page title" description="Meta description">…</x-layouts.site>
      Extra <head> tags (Open Graph, structured data) go in <x-slot:head>. --}}
 @php
@@ -22,6 +22,17 @@
     <meta name="description" content="{{ $metaDescription }}">
     <link rel="canonical" href="{{ url()->current() }}">
     <meta name="theme-color" content="#2E1065">
+
+    {{-- How the page appears when its link is shared (Open Graph / social cards). --}}
+    <meta property="og:site_name" content="{{ $siteName }}">
+    <meta property="og:type" content="{{ $ogType }}">
+    <meta property="og:title" content="{{ $title ?: $siteName }}">
+    <meta property="og:description" content="{{ $metaDescription }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @if ($ogImage)
+        <meta property="og:image" content="{{ $ogImage }}">
+    @endif
+    <meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @if ($preview)

@@ -26,7 +26,7 @@
 
     trix-editor {
         background: #ffffff;
-        border: 1px solid var(--et-neutral-300);
+        border: 1px solid var(--et-neutral-500);
         border-radius: var(--et-radius-control);
         color: var(--et-neutral-900);
         font-size: 1rem;

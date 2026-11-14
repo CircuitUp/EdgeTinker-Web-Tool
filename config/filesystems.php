@@ -40,7 +40,10 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
+            // Normally storage/app/public, reached from the web through the public/storage
+            // symlink. On a host where a symlink cannot be created, set PUBLIC_DISK_ROOT to
+            // the web root's "storage" folder instead (see docs/DEPLOYMENT.md).
+            'root' => env('PUBLIC_DISK_ROOT', storage_path('app/public')),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
             'throw' => false,

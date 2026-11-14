@@ -66,7 +66,7 @@
                                          x-transition:enter="transition-opacity duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                                          class="absolute inset-0">
                                         @if ($item['image'])
-                                            <img src="{{ $item['image'] }}" alt="" loading="lazy" decoding="async" class="h-full w-full object-cover">
+                                            <img src="{{ $item['image'] }}" alt="" width="800" height="600" loading="lazy" decoding="async" class="h-full w-full object-cover">
                                         @endif
                                         <div class="absolute inset-x-0 bottom-0 bg-primary-900/90 px-5 py-4">
                                             <p class="text-lg font-semibold text-white">{{ $item['label'] }}</p>

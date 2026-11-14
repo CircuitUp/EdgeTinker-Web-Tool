@@ -8,16 +8,9 @@
     $enquireUrl = route('contact', ['subject' => __('site.product.enquiry_subject', ['name' => $product->name, 'sku' => $product->sku])]);
     $seoDescription = $product->seo_description ?: $product->short_description;
 @endphp
-<x-layouts.site :title="$product->seo_title ?: $product->name" :description="$seoDescription" :preview="$isPreview ?? false">
+<x-layouts.site :title="$product->seo_title ?: $product->name" :description="$seoDescription" :preview="$isPreview ?? false"
+                og-type="product" :og-image="$firstImage['src'] ?? null">
     <x-slot:head>
-        <meta property="og:type" content="product">
-        <meta property="og:title" content="{{ $product->name }}">
-        <meta property="og:description" content="{{ $seoDescription }}">
-        <meta property="og:url" content="{{ route('products.show', $product->slug) }}">
-        <meta property="og:site_name" content="{{ setting('site.name') }}">
-        @if ($firstImage)
-            <meta property="og:image" content="{{ $firstImage['src'] }}">
-        @endif
         @unless ($isPreview ?? false)
             <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
         @endunless
@@ -73,7 +66,7 @@
                          x-transition.opacity @click.self="close()"
                          @keydown.arrow-left.window="lightbox && previous()" @keydown.arrow-right.window="lightbox && next()">
                         <div x-trap.inert.noscroll="lightbox" class="relative flex max-h-full w-full max-w-4xl flex-col items-center gap-4">
-                            <img :src="current.src" :alt="current.alt" class="max-h-[80vh] w-auto max-w-full rounded-card bg-white object-contain">
+                            <img :src="current.src" :alt="current.alt" alt="" width="1200" height="1200" class="max-h-[80vh] w-auto max-w-full rounded-card bg-white object-contain">
                             @php $viewerButton = 'inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/50 bg-neutral-900/60 text-white hover:bg-white/15'; @endphp
                             <div class="flex items-center gap-3">
                                 @if ($gallery->count() > 1)
@@ -102,7 +95,7 @@
 
             {{-- Key facts --}}
             <div class="min-w-0">
-                <a href="{{ route('products.category', $product->category->slug) }}" class="text-sm font-semibold uppercase tracking-wider text-primary-700 underline-offset-4 hover:underline">
+                <a href="{{ route('products.category', $product->category->slug) }}" class="inline-flex min-h-8 items-center text-sm font-semibold uppercase tracking-wider text-primary-700 underline-offset-4 hover:underline">
                     {{ $product->category->name }}
                 </a>
                 <h1 class="mt-2 text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">{{ $product->name }}</h1>

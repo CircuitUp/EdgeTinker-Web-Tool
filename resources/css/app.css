@@ -189,6 +189,22 @@
     }
 }
 
+/*
+ * Form-control boundaries (WCAG 1.4.11): the edge of a text box, select or
+ * text area must contrast at least 3:1 with the page. Neutral 500 on white is
+ * 4.8:1. This rule is deliberately outside the cascade layers so that it
+ * applies to every control, whatever border utility a template uses.
+ * Invalid fields (red border) and the wiki's search box on its dark bar keep
+ * their own colours.
+ */
+:where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='hidden']), select, textarea):not(.border-danger, [class*='border-white']) {
+    border-color: var(--et-neutral-500);
+}
+
+:where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='hidden']), select, textarea):not(.border-danger, [class*='border-white']):hover {
+    border-color: var(--et-neutral-700);
+}
+
 @layer components {
     /* ── Wiki article content (generated from Markdown by App\Support\WikiMarkdown) ── */
     .wiki-content {

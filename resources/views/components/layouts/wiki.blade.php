@@ -20,6 +20,12 @@
     <meta name="description" content="{{ $description ?? __('site.wiki.tagline') }}">
     <link rel="canonical" href="{{ url()->current() }}">
     <meta name="theme-color" content="#2E1065">
+    <meta property="og:site_name" content="{{ $siteName }} {{ __('site.wiki.title') }}">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ $title ?: __('site.wiki.title') }}">
+    <meta property="og:description" content="{{ $description ?? __('site.wiki.tagline') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta name="twitter:card" content="summary">
     @if ($preview || $noindex)
         <meta name="robots" content="noindex, follow">
     @endif

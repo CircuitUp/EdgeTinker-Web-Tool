@@ -14,6 +14,7 @@ use App\Studio\ContentTypes\WikiPageType;
 use App\Support\Currency;
 use App\Support\Settings;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -46,6 +47,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::defaultView('pagination.default');
+
+        // On the live site every generated link is https, even if the request
+        // reached PHP as plain http from the hosting company's front-end server.
+        if ($this->app->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
 
         // The header (mega menu, drawer) and footer list categories on every page.
         View::composer(

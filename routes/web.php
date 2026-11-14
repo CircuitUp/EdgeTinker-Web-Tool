@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductListingController;
 use App\Http\Controllers\SearchSuggestController;
+use App\Http\Controllers\SeoController;
 use App\Http\Controllers\StyleguideController;
 use App\Http\Controllers\WikiController;
 use App\Support\PageContent;
@@ -36,6 +37,10 @@ Route::get('/wiki', [WikiController::class, 'index'])->name('wiki.index');
 Route::get('/wiki/search', [WikiController::class, 'search'])->name('wiki.search');
 Route::get('/wiki/{category}/{product}', [WikiController::class, 'product'])->name('wiki.product');
 Route::get('/wiki/{category}/{product}/{page}', [WikiController::class, 'show'])->name('wiki.show');
+
+// For search engines.
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
 
 // Currency toggle (USD / LKR), remembered in a cookie.
 Route::post('/currency', CurrencyController::class)->name('currency.switch');

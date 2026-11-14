@@ -28,7 +28,7 @@
                        :class="active === index ? 'bg-primary-50' : ''"
                        class="flex min-h-14 items-center gap-3 px-3 py-2">
                         <span class="h-10 w-10 shrink-0 overflow-hidden rounded-control border border-neutral-200 bg-neutral-50">
-                            <img :src="item.image" alt="" x-show="item.image" class="h-full w-full object-contain">
+                            <img :src="item.image" alt="" width="40" height="40" x-show="item.image" class="h-full w-full object-contain">
                         </span>
                         <span class="min-w-0 flex-1">
                             <span class="block truncate text-base font-medium text-neutral-900" x-text="item.name"></span>

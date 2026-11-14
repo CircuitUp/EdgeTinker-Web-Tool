@@ -1,5 +1,19 @@
 {{-- Section text comes from Content Studio → Pages → Home ($content); slides and featured products are chosen there too. --}}
 <x-layouts.site :title="$seo['title'] ?? null" :description="$seo['description'] ?? null" :preview="$isPreview ?? false">
+    @unless ($isPreview ?? false)
+        <x-slot:head>
+            {{-- Tells search engines who runs the site and that it has a search box. --}}
+            <script type="application/ld+json">{!! json_encode([
+                '@context' => 'https://schema.org',
+                '@graph' => [
+                    ['@type' => 'Organization', 'name' => setting('site.name'), 'url' => route('home'), 'description' => setting('site.tagline')],
+                    ['@type' => 'WebSite', 'name' => setting('site.name'), 'url' => route('home'),
+                        'potentialAction' => ['@type' => 'SearchAction', 'target' => route('search').'?q={search_term_string}', 'query-input' => 'required name=search_term_string']],
+                ],
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
+        </x-slot:head>
+    @endunless
+
     <h1 class="sr-only">{{ setting('site.name') }} – {{ setting('site.tagline') }}</h1>
 
     {{-- 1. Hero slideshow ------------------------------------------------- --}}

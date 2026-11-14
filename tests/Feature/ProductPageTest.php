@@ -141,7 +141,8 @@ class ProductPageTest extends TestCase
 
         $response->assertSee('<title>EdgeSense One sensor | EdgeTinker</title>', false)
             ->assertSee('<link rel="canonical" href="'.route('products.show', 'edgesense-one').'">', false)
-            ->assertSee('property="og:title" content="EdgeSense One"', false)
+            ->assertSee('property="og:type" content="product"', false)
+            ->assertSee('property="og:title" content="EdgeSense One sensor | EdgeTinker"', false)
             ->assertSee('application/ld+json', false);
 
         $data = $response->viewData('structuredData');

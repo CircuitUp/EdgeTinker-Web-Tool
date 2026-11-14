@@ -6,10 +6,13 @@ use App\Models\BannerSlide;
 use App\Models\Category;
 use App\Models\Media;
 use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 
 /** Gathers everything the home page shows. Also used to preview a pending change to the page. */
 class HomePage
 {
+    public const SLIDES_CACHE_KEY = 'home.data';
+
     /**
      * @param  array|null  $override  page content from a pending revision (for the Content Studio
      *                                preview); null renders what is live
@@ -21,12 +24,22 @@ class HomePage
 
         return [
             'content' => $content,
-            'slides' => $override === null ? BannerSlide::active()->get() : self::slidesFrom($content['slides'] ?? []),
+            'slides' => $override === null ? self::liveSlides() : self::slidesFrom($content['slides'] ?? []),
             'categories' => Category::navigation(),
             'featured' => self::featured($override === null ? null : ($content['featured_product_ids'] ?? [])),
             'services' => $pages->get('services')['services'],
             'seo' => $override === null ? $pages->seo('home') : ['title' => null, 'description' => null],
         ];
+    }
+
+    /**
+     * The live slides, cached as plain rows. Slides only change when a Home
+     * page revision is approved, which clears this cache (SiteCache::flush()).
+     */
+    private static function liveSlides()
+    {
+        return BannerSlide::hydrate(Cache::remember(self::SLIDES_CACHE_KEY, now()->addHours(6),
+            fn () => BannerSlide::active()->get()->map(fn (BannerSlide $slide) => $slide->getAttributes())->all()));
     }
 
     /** Featured products, in the order chosen on the Home page editor (others follow, newest first). */
