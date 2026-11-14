@@ -13,7 +13,7 @@ One Laravel application with three parts:
 | 1 | Project setup, design system, `/styleguide`, header, footer, mega menu, home page | Done |
 | 2 | Products: categories, product page, search and filters, currency toggle | Done |
 | 3 | Content Studio: authentication, roles, product/tag/category management, approval workflow | Done |
-| 4 | Page editing, Services, Contact, wiki | Not started |
+| 4 | Page editing, Services, Contact, wiki, messages, site settings | Done |
 | 5 | Hardening, tests, SEO, performance, Hostinger deployment guide | Not started |
 
 Pages that belong to a later phase currently show a "coming in phase N" notice.

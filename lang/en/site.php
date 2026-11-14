@@ -130,41 +130,65 @@ return [
         'pause' => 'Pause slideshow',
         'play' => 'Play slideshow',
 
-        'categories_heading' => 'Browse by category',
-        'categories_intro' => 'Boards and modules for every stage of an embedded design.',
-
-        'featured_heading' => 'Featured products',
-        'featured_intro' => 'A selection of our most popular boards.',
+        // Headings and paragraphs of the home page are edited in Content Studio
+        // (defaults: App\Support\PageContent). Only fixed interface text is here.
         'featured_all' => 'View all products',
         'featured_empty_title' => 'No featured products yet',
         'featured_empty_text' => 'Mark products as featured in Content Studio and they will appear here.',
-
-        'services_heading' => 'Engineering services',
-        'services_intro' => 'Need something that is not in the catalogue? Our team designs custom hardware, firmware and software from concept to production.',
         'services_cta' => 'Explore our services',
-
-        'why_heading' => 'Why EdgeTinker',
-        'why' => [
-            ['title' => 'Designed by engineers', 'text' => 'Every board is designed, laid out and tested in-house by the people who support it.'],
-            ['title' => 'Documented properly', 'text' => 'Pinouts, schematics, datasheets and firmware guides are published in our wiki for every product.'],
-            ['title' => 'Built to integrate', 'text' => 'Standard headers, sensible footprints and open examples make our boards easy to design into your product.'],
-            ['title' => 'Support that answers', 'text' => 'Questions go to engineers who know the hardware, not a ticket queue.'],
-        ],
-
-        'contact_heading' => 'Have a project in mind?',
-        'contact_text' => 'Tell us what you are building. We will help you pick the right board or scope a custom design.',
         'contact_cta' => 'Contact us',
         'contact_secondary' => 'Read the wiki',
     ],
 
-    // Short service summaries used on the home page (the Services page expands on these).
     'services' => [
-        ['icon' => 'cpu', 'title' => 'Custom Electronics Development', 'text' => 'From requirements to working prototypes and production-ready designs.'],
-        ['icon' => 'layers', 'title' => 'PCB Design', 'text' => 'Schematic capture and multi-layer layout, designed for manufacture.'],
-        ['icon' => 'code', 'title' => 'Firmware Development', 'text' => 'Reliable embedded firmware for microcontrollers and wireless modules.'],
-        ['icon' => 'box', 'title' => 'Enclosure Design', 'text' => '3D-printed and injection-moulded enclosures that fit your board.'],
-        ['icon' => 'monitor', 'title' => 'Web Application Development', 'text' => 'Dashboards and cloud back ends for connected devices.'],
-        ['icon' => 'smartphone', 'title' => 'Mobile App Development', 'text' => 'Companion apps for iOS and Android over Bluetooth and Wi-Fi.'],
+        'deliverables' => 'Typical deliverables',
+        'step' => 'Step :number',
+        'enquire_about' => 'Enquire about :service',
+        'enquiry_subject' => 'Enquiry: :service',
+        'general_subject' => 'Project enquiry',
+    ],
+
+    'contact' => [
+        'name' => 'Your name',
+        'email' => 'Email address',
+        'company' => 'Company',
+        'optional' => 'optional',
+        'subject' => 'Subject',
+        'message' => 'Message',
+        'message_hint' => 'Tell us what you need. Please do not include passwords or payment details.',
+        'send' => 'Send message',
+        'required_note' => 'Fields marked * are required.',
+        'error_summary' => 'Please correct the highlighted fields and send the form again.',
+        'address' => 'Address',
+        'email_label' => 'Email',
+        'phone' => 'Phone',
+        'map_title' => 'Map showing our location',
+        'map_placeholder' => '[PLACEHOLDER] A map appears here once a map link is added in Site settings.',
+        'honeypot' => 'Leave this field empty',
+    ],
+
+    'wiki' => [
+        'title' => 'Wiki',
+        'tagline' => 'Pinouts, schematics, datasheets and firmware guides for EdgeTinker products.',
+        'search_label' => 'Search the wiki',
+        'search_placeholder' => 'Search the wiki…',
+        'back_to_site' => 'Back to main site',
+        'contents' => 'Wiki contents',
+        'open_contents' => 'Browse the wiki',
+        'close_contents' => 'Close',
+        'on_this_page' => 'On this page',
+        'last_updated' => 'Last updated :date',
+        'previous' => 'Previous',
+        'next' => 'Next',
+        'product_page' => 'View product page',
+        'empty_title' => 'The wiki is being written',
+        'empty_text' => 'Documentation will appear here as it is published.',
+        'pages_count' => '{1} :count page|[2,*] :count pages',
+        'search_heading' => 'Search results for “:query”',
+        'search_heading_empty' => 'Search the wiki',
+        'search_count' => '{0} No pages found|{1} :count page found|[2,*] :count pages found',
+        'search_empty' => 'Nothing matches “:query”. Try a product name, a part number, or a more general word.',
+        'search_prompt' => 'Type a product name, part number or topic in the search box above.',
     ],
 
     'footer' => [
@@ -173,12 +197,6 @@ return [
         'contact' => 'Contact',
         'follow' => 'Follow us',
         'rights' => 'All rights reserved.',
-    ],
-
-    'coming_soon' => [
-        'title' => ':page is on its way',
-        'text' => 'This page is built in Phase :phase of the project and is not available yet.',
-        'back' => 'Back to home',
     ],
 
 ];

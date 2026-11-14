@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Support\SiteCache;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,7 +15,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             DemoCatalogueSeeder::class,
+            DemoWikiSeeder::class,
         ]);
+
+        SiteCache::flush();
 
         // A demo login with a published password must never exist on the live site.
         if (! app()->isProduction()) {

@@ -8,7 +8,7 @@
     $enquireUrl = route('contact', ['subject' => __('site.product.enquiry_subject', ['name' => $product->name, 'sku' => $product->sku])]);
     $seoDescription = $product->seo_description ?: $product->short_description;
 @endphp
-<x-layouts.site :title="$product->seo_title ?: $product->name" :description="$seoDescription">
+<x-layouts.site :title="$product->seo_title ?: $product->name" :description="$seoDescription" :preview="$isPreview ?? false">
     <x-slot:head>
         <meta property="og:type" content="product">
         <meta property="og:title" content="{{ $product->name }}">
@@ -18,19 +18,10 @@
         @if ($firstImage)
             <meta property="og:image" content="{{ $firstImage['src'] }}">
         @endif
-        @if ($isPreview ?? false)
-            <meta name="robots" content="noindex, nofollow">
-        @else
+        @unless ($isPreview ?? false)
             <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
-        @endif
+        @endunless
     </x-slot:head>
-
-    @if ($isPreview ?? false)
-        {{-- Shown only inside Content Studio's preview: this page is not live. --}}
-        <div class="bg-accent px-4 py-2 text-center text-base font-semibold text-neutral-900" role="status">
-            Preview only. This is how the page would look if the change were approved. It is not on the live site.
-        </div>
-    @endif
 
     <div class="border-b border-neutral-200 bg-neutral-50">
         <div class="container-page py-4">
@@ -251,7 +242,9 @@
                             <p class="text-base text-neutral-600">{{ __('site.product.wiki_text') }}</p>
                         </div>
                     </div>
-                    <x-button :href="route('wiki.index')" variant="secondary" target="_blank" rel="noopener" class="shrink-0">
+                    {{-- Straight to this product's wiki when it has pages; otherwise the wiki's front page. --}}
+                    <x-button :href="$product->exists && $product->wikiPages()->exists() ? route('wiki.product', [$product->category->slug, $product->slug]) : route('wiki.index')"
+                              variant="secondary" target="_blank" rel="noopener" class="shrink-0">
                         {{ __('site.product.wiki_cta') }} <x-icon name="external" class="h-4 w-4" />
                         <span class="sr-only">{{ __('site.nav.new_tab') }}</span>
                     </x-button>

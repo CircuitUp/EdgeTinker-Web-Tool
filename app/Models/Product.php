@@ -66,6 +66,11 @@ class Product extends Model
         return $this->hasMany(ProductDocument::class)->orderBy('sort_order');
     }
 
+    public function wikiPages(): HasMany
+    {
+        return $this->hasMany(WikiPage::class)->orderBy('sort_order')->orderBy('id');
+    }
+
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);

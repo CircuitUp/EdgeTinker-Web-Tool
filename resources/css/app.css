@@ -190,6 +190,135 @@
 }
 
 @layer components {
+    /* ── Wiki article content (generated from Markdown by App\Support\WikiMarkdown) ── */
+    .wiki-content {
+        max-width: none;
+    }
+
+    .wiki-content h2,
+    .wiki-content h3,
+    .wiki-content h4 {
+        scroll-margin-top: 6rem; /* clear the sticky top bar when jumping to a heading */
+    }
+
+    .wiki-content h2 {
+        border-bottom: 1px solid var(--et-neutral-200);
+        padding-bottom: 0.5rem;
+    }
+
+    .wiki-content .callout {
+        border-left: 4px solid var(--et-primary-600);
+        border-radius: var(--et-radius-control);
+        background: var(--et-primary-50);
+        padding: 0.75rem 1rem;
+    }
+
+    .wiki-content .callout > * + * {
+        margin-top: 0.5rem;
+    }
+
+    .wiki-content .callout-title {
+        color: var(--et-primary-700);
+        font-size: 0.875rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .wiki-content .callout-tip {
+        background: var(--et-success-50);
+        border-left-color: var(--et-success);
+    }
+
+    .wiki-content .callout-tip .callout-title {
+        color: var(--et-success);
+    }
+
+    .wiki-content .callout-warning {
+        background: var(--et-warning-50);
+        border-left-color: var(--et-warning);
+    }
+
+    .wiki-content .callout-warning .callout-title {
+        color: var(--et-warning);
+    }
+
+    .wiki-content .code-block {
+        border-radius: var(--et-radius-card);
+        overflow: hidden;
+    }
+
+    .wiki-content .code-block-bar {
+        align-items: center;
+        background: var(--et-neutral-800);
+        color: var(--et-neutral-300);
+        display: flex;
+        font-family: var(--et-font-mono);
+        font-size: 0.875rem;
+        justify-content: space-between;
+        min-height: 2.5rem;
+        padding: 0 0.5rem 0 1rem;
+    }
+
+    .wiki-content .code-copy {
+        border: 1px solid var(--et-neutral-500);
+        border-radius: var(--et-radius-control);
+        color: #ffffff;
+        font-family: var(--et-font-sans);
+        font-size: 0.875rem;
+        font-weight: 600;
+        min-height: 2rem;
+        padding: 0 0.75rem;
+    }
+
+    .wiki-content .code-copy:hover {
+        background: var(--et-neutral-700);
+    }
+
+    .wiki-content .code-copy:focus-visible {
+        outline-color: #ffffff;
+    }
+
+    .wiki-content .code-block pre {
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .wiki-content .table-scroll {
+        border: 1px solid var(--et-neutral-200);
+        border-radius: var(--et-radius-card);
+        overflow-x: auto;
+    }
+
+    .wiki-content .table-scroll table {
+        border-collapse: collapse;
+        display: table;
+        width: 100%;
+    }
+
+    .wiki-content .table-scroll th,
+    .wiki-content .table-scroll td {
+        border: 0;
+        border-top: 1px solid var(--et-neutral-200);
+        white-space: nowrap;
+    }
+
+    .wiki-content .table-scroll thead th {
+        border-top: 0;
+    }
+
+    .wiki-content a.download-link {
+        font-weight: 600;
+    }
+
+    .wiki-content a.download-link::before {
+        content: '↓ ';
+    }
+
+    .wiki-content li > input[type='checkbox'] {
+        margin-right: 0.5rem;
+    }
+
     /* Two-handle price slider: two native range inputs stacked on one track.
        The inputs ignore the pointer; only their thumbs take it, so both stay reachable. */
     .range-dual {

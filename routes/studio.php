@@ -55,6 +55,17 @@ Route::middleware('studio')->group(function () {
     Route::livewire('/categories/revision/{revision}', Studio\Categories\Form::class)->whereNumber('revision')->name('categories.revision');
 
     Route::livewire('/tags', Studio\Tags\Index::class)->name('tags.index');
+
+    // Home, Services and Contact page content.
+    Route::livewire('/pages', Studio\Pages\Index::class)->name('pages.index');
+    Route::livewire('/pages/revision/{revision}', Studio\Pages\Form::class)->whereNumber('revision')->name('pages.revision');
+    Route::livewire('/pages/{page}', Studio\Pages\Form::class)->whereIn('page', ['home', 'services', 'contact'])->name('pages.edit');
+
+    // Wiki tree manager and Markdown editor.
+    Route::livewire('/wiki', Studio\Wiki\Index::class)->name('wiki.index');
+    Route::livewire('/wiki/new', Studio\Wiki\Form::class)->name('wiki.create');
+    Route::livewire('/wiki/{page}/edit', Studio\Wiki\Form::class)->whereNumber('page')->name('wiki.edit');
+    Route::livewire('/wiki/revision/{revision}', Studio\Wiki\Form::class)->whereNumber('revision')->name('wiki.revision');
     Route::livewire('/media', Studio\Media\Library::class)->name('media.index');
 
     // A creator's own submissions (the admin sees everyone's).
@@ -69,6 +80,8 @@ Route::middleware('studio')->group(function () {
     Route::middleware('studio:admin')->group(function () {
         Route::livewire('/review', Studio\Revisions\Index::class)->name('review.index');
         Route::livewire('/review/{revision}', Studio\Revisions\Show::class)->whereNumber('revision')->name('review.show');
+        Route::livewire('/messages', Studio\Messages\Index::class)->name('messages.index');
+        Route::livewire('/settings', Studio\Settings::class)->name('settings');
         Route::livewire('/users', Studio\Users\Index::class)->name('users.index');
         Route::livewire('/audit-log', Studio\AuditLogIndex::class)->name('audit.index');
     });

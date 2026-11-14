@@ -1,4 +1,4 @@
-@props(['title' => null, 'description' => null])
+@props(['title' => null, 'description' => null, 'preview' => false])
 {{-- Public site layout: <x-layouts.site title="Page title" description="Meta description">…</x-layouts.site>
      Extra <head> tags (Open Graph, structured data) go in <x-slot:head>. --}}
 @php
@@ -24,12 +24,22 @@
     <meta name="theme-color" content="#2E1065">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if ($preview)
+        <meta name="robots" content="noindex, nofollow">
+    @endif
     {{ $head ?? '' }}
 </head>
 <body class="flex min-h-screen flex-col bg-white text-neutral-900">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-control focus:bg-primary-600 focus:px-4 focus:py-2 focus:font-semibold focus:text-white">
         {{ __('site.nav.skip') }}
     </a>
+
+    @if ($preview)
+        {{-- Only ever rendered inside Content Studio's preview of a pending change. --}}
+        <div class="bg-accent px-4 py-2 text-center text-base font-semibold text-neutral-900" role="status">
+            Preview only. This is how the page would look if the change were approved. It is not on the live site.
+        </div>
+    @endif
 
     <x-site.header />
 

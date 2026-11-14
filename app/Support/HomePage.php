@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Support;
+
+use App\Models\BannerSlide;
+use App\Models\Category;
+use App\Models\Media;
+use App\Models\Product;
+
+/** Gathers everything the home page shows. Also used to preview a pending change to the page. */
+class HomePage
+{
+    /**
+     * @param  array|null  $override  page content from a pending revision (for the Content Studio
+     *                                preview); null renders what is live
+     */
+    public static function data(?array $override = null): array
+    {
+        $pages = app(PageContent::class);
+        $content = $override === null ? $pages->get('home') : array_replace(PageContent::defaults('home'), $override);
+
+        return [
+            'content' => $content,
+            'slides' => $override === null ? BannerSlide::active()->get() : self::slidesFrom($content['slides'] ?? []),
+            'categories' => Category::navigation(),
+            'featured' => self::featured($override === null ? null : ($content['featured_product_ids'] ?? [])),
+            'services' => $pages->get('services')['services'],
+            'seo' => $override === null ? $pages->seo('home') : ['title' => null, 'description' => null],
+        ];
+    }
+
+    /** Featured products, in the order chosen on the Home page editor (others follow, newest first). */
+    private static function featured(?array $previewIds)
+    {
+        $limit = config('edgetinker.home.featured_limit');
+
+        if ($previewIds !== null) {
+            $products = Product::forCard()->whereIn('id', $previewIds)->get();
+            $order = array_flip($previewIds);
+        } else {
+            $products = Product::featured()->forCard()->latest()->get();
+            $order = array_flip(app(PageContent::class)->get('home')['featured_product_ids'] ?? []);
+        }
+
+        return $products->sortBy(fn (Product $product) => $order[$product->id] ?? PHP_INT_MAX)->take($limit)->values();
+    }
+
+    /** Unsaved slide models built from a revision payload. */
+    private static function slidesFrom(array $rows)
+    {
+        $media = Media::whereIn('id', collect($rows)->pluck('image.media_id')->filter())->get()->keyBy('id');
+
+        return collect($rows)->map(fn (array $row) => new BannerSlide([
+            'heading' => $row['heading'] ?? '',
+            'sub_text' => $row['sub_text'] ?? null,
+            'button_label' => $row['button_label'] ?? null,
+            'button_url' => $row['button_url'] ?? null,
+            'image_path' => ($row['image']['media_id'] ?? null) ? ($media[$row['image']['media_id']]->path ?? null) : ($row['image']['path'] ?? null),
+            'image_alt' => $row['image_alt'] ?? '',
+        ]));
+    }
+}

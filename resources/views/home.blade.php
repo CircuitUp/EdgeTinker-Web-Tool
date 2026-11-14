@@ -1,4 +1,5 @@
-<x-layouts.site>
+{{-- Section text comes from Content Studio → Pages → Home ($content); slides and featured products are chosen there too. --}}
+<x-layouts.site :title="$seo['title'] ?? null" :description="$seo['description'] ?? null" :preview="$isPreview ?? false">
     <h1 class="sr-only">{{ setting('site.name') }} – {{ setting('site.tagline') }}</h1>
 
     {{-- 1. Hero slideshow ------------------------------------------------- --}}
@@ -81,7 +82,7 @@
     @if ($categories->isNotEmpty())
         <section class="py-12 sm:py-16" aria-labelledby="home-categories">
             <div class="container-page">
-                <x-section-heading id="home-categories" :title="__('site.home.categories_heading')" :intro="__('site.home.categories_intro')" />
+                <x-section-heading id="home-categories" :title="$content['categories_heading']" :intro="$content['categories_intro']" />
 
                 <ul class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5">
                     @foreach ($categories as $category)
@@ -111,7 +112,7 @@
     {{-- 3. Featured products ---------------------------------------------- --}}
     <section class="bg-neutral-50 py-12 sm:py-16" aria-labelledby="home-featured">
         <div class="container-page">
-            <x-section-heading id="home-featured" :title="__('site.home.featured_heading')" :intro="__('site.home.featured_intro')">
+            <x-section-heading id="home-featured" :title="$content['featured_heading']" :intro="$content['featured_intro']">
                 <x-button :href="route('products.index')" variant="secondary">
                     {{ __('site.home.featured_all') }} <x-icon name="arrow-right" class="h-4 w-4" />
                 </x-button>
@@ -133,15 +134,15 @@
     <section class="py-12 sm:py-16" aria-labelledby="home-services">
         <div class="container-page grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
             <div>
-                <h2 id="home-services" class="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">{{ __('site.home.services_heading') }}</h2>
-                <p class="mt-3 text-lg text-neutral-600">{{ __('site.home.services_intro') }}</p>
+                <h2 id="home-services" class="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">{{ $content['services_heading'] }}</h2>
+                <p class="mt-3 text-lg text-neutral-600">{{ $content['services_intro'] }}</p>
                 <x-button :href="route('services')" class="mt-6">
                     {{ __('site.home.services_cta') }} <x-icon name="arrow-right" class="h-4 w-4" />
                 </x-button>
             </div>
 
             <ul class="grid gap-x-8 gap-y-8 sm:grid-cols-2">
-                @foreach (__('site.services') as $service)
+                @foreach ($services as $service)
                     <li class="flex gap-4">
                         <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-primary-100 text-primary-700">
                             <x-icon :name="$service['icon']" class="h-6 w-6" />
@@ -159,10 +160,10 @@
     {{-- 5. Why EdgeTinker ------------------------------------------------- --}}
     <section class="bg-primary-50 py-12 sm:py-16" aria-labelledby="home-why">
         <div class="container-page">
-            <x-section-heading id="home-why" :title="__('site.home.why_heading')" />
+            <x-section-heading id="home-why" :title="$content['why_heading']" />
 
             <ul class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach (__('site.home.why') as $reason)
+                @foreach ($content['why'] as $reason)
                     <li class="rounded-card border border-primary-200 bg-white p-5">
                         <span class="block h-1 w-10 rounded-full bg-accent" aria-hidden="true"></span>
                         <h3 class="mt-4 text-lg font-semibold text-neutral-900">{{ $reason['title'] }}</h3>
@@ -178,8 +179,8 @@
         <div class="container-page">
             <div class="on-dark flex flex-col items-start gap-6 rounded-panel bg-primary-900 px-6 py-10 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:py-12">
                 <div class="max-w-2xl">
-                    <h2 id="home-contact" class="text-2xl font-bold tracking-tight text-white sm:text-3xl">{{ __('site.home.contact_heading') }}</h2>
-                    <p class="mt-2 text-lg text-primary-100">{{ __('site.home.contact_text') }}</p>
+                    <h2 id="home-contact" class="text-2xl font-bold tracking-tight text-white sm:text-3xl">{{ $content['contact_heading'] }}</h2>
+                    <p class="mt-2 text-lg text-primary-100">{{ $content['contact_text'] }}</p>
                 </div>
                 <div class="flex flex-wrap gap-3">
                     <x-button :href="route('contact')" variant="inverse" size="lg">{{ __('site.home.contact_cta') }}</x-button>
