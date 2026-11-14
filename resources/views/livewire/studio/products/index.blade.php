@@ -80,7 +80,7 @@
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-2">
-                                <x-button :href="$mine ? route('studio.products.revision', $mine) : route('studio.products.edit', $product)" variant="secondary" size="sm">
+                                <x-button :href="$mine ? route('studio.products.revision', $mine) : route('studio.products.edit', $product->id)" variant="secondary" size="sm">
                                     {{ $mine ? 'Continue editing' : 'Edit' }}
                                 </x-button>
                                 <x-button :href="route('studio.history', ['type' => 'product', 'id' => $product->id])" variant="ghost" size="sm">History</x-button>

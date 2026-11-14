@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Models\Revision;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\WikiPage;
 use App\Notifications\Studio\AccountStatusChanged;
 use App\Notifications\Studio\ResetPasswordNotification;
 use App\Studio\MediaLibrary;
@@ -194,6 +195,35 @@ class StudioScreensTest extends TestCase
         $this->assertSame(RevisionStatus::Draft, $revision->status);
         $this->assertSame($product->id, $revision->entity_id);
         $this->assertSame('Short description.', $product->fresh()->short_description);
+    }
+
+    public function test_every_link_on_the_studio_list_screens_opens(): void
+    {
+        // Regression: the product list once linked "Edit" to the product's web address
+        // (/products/abc-core/edit) instead of its number, which gave "page not found".
+        $category = $this->makeCategory('Sensor Boards');
+        $product = $this->makeProduct($category, 'ABC Core', ['slug' => 'abc-core']);
+        WikiPage::create(['product_id' => $product->id, 'title' => 'Overview', 'slug' => 'overview', 'body' => 'Text', 'sort_order' => 1]);
+        Tag::create(['name' => 'I2C', 'slug' => 'i2c']);
+        app(RevisionService::class)->save($this->creator, 'product', null,
+            ['name' => 'Pending Board', 'sku' => 'ET-PEND-1', 'category_id' => $category->id, 'short_description' => 'Pending.'], submit: true);
+
+        $this->actingAs($this->admin)->get('/contentcreator/products')
+            ->assertSee('href="'.url("/contentcreator/products/{$product->id}/edit").'"', false)
+            ->assertDontSee('/contentcreator/products/abc-core/edit', false);
+
+        $visited = 0;
+        foreach (['/products', '/categories', '/tags', '/pages', '/wiki?product='.$product->id, '/submissions', '/review', '/media', '/users', '/messages', ''] as $screen) {
+            $html = $this->actingAs($this->admin)->get('/contentcreator'.$screen)->assertOk()->getContent();
+
+            preg_match_all('#href="('.preg_quote(url('/contentcreator'), '#').'/[^"\#]*)"#', $html, $matches);
+            foreach (array_unique($matches[1]) as $link) {
+                $this->actingAs($this->admin)->get(html_entity_decode($link))->assertOk();
+                $visited++;
+            }
+        }
+
+        $this->assertGreaterThan(25, $visited, 'The check should have followed the screens’ links.');
     }
 
     public function test_a_creator_cannot_open_another_creators_draft(): void
