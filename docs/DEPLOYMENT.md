@@ -162,11 +162,16 @@ If it shows an older version, use the full path to a newer one in every command 
 
 ```bash
 # 1. Download the PHP libraries (takes a minute or two).
-composer install --no-dev --optimize-autoloader
-#    If "composer" is not found or is version 1, use: composer2 install --no-dev --optimize-autoloader
+#    --no-scripts: Hostinger disables PHP's proc_open, which Composer needs to run its
+#    automatic follow-up step, so that step is run by hand on the next line instead.
+composer install --no-dev --optimize-autoloader --no-scripts
+php artisan package:discover
+#    If "composer" is not found or is version 1, use composer2 in place of composer.
 
 # 2. Generate the encryption key (writes APP_KEY into .env).
-php artisan key:generate
+#    --force skips the "Application in production, are you sure?" question,
+#    which cannot be shown on Hostinger for the same proc_open reason.
+php artisan key:generate --force
 
 # 3. Create the database tables.
 php artisan migrate --force
@@ -200,13 +205,14 @@ chmod -R 775 storage bootstrap/cache
 
 ## 8. Create the Content Admin
 
-There is exactly one Content Admin, and this command is the only way to create it:
+There is exactly one Content Admin, and this command is the only way to create it. Give the answers on the command line (on Hostinger the command cannot ask questions interactively, because `proc_open` is disabled):
 
 ```bash
-php artisan studio:create-admin
+php artisan studio:create-admin --name="Your Name" --email="you@edgetinker.com" --password="Choose-A-Strong-Passw0rd"
+history -c
 ```
 
-It asks for a name, an email address and a password (at least 10 characters, with upper and lower case letters and a number). The password is not shown as you type.
+The password needs at least 10 characters, with upper and lower case letters and a number. `history -c` clears the server's command history, so the password you just typed is not left there. You can also change the password after signing in, under **Account**.
 
 You can now sign in at `https://edgetinker.com/contentcreator`. The address is not linked from anywhere on the site; bookmark it. After signing in, turn on two-factor authentication under **Account**.
 
@@ -297,7 +303,8 @@ cd ~/domains/edgetinker.com/app
 
 php artisan down                 # shows a "back shortly" page to visitors
 git pull                         # fetch the new version
-composer install --no-dev --optimize-autoloader
+composer install --no-dev --optimize-autoloader --no-scripts
+php artisan package:discover     # the step Composer cannot run itself on Hostinger
 php artisan migrate --force      # apply any database changes
 php artisan optimize:clear       # drop the old cached configuration and templates
 php artisan optimize             # cache the new ones
@@ -342,6 +349,8 @@ Cloud plans include SSH, and it makes everything above much easier. If you truly
 
 | Symptom | Likely cause and fix |
 |---|---|
+| "The Process class relies on proc_open, which is not available" during `composer install` | Hostinger disables `proc_open`. Add `--no-scripts` to `composer install`, then run `php artisan package:discover` yourself (step 7). |
+| "Call to undefined function Laravel\Prompts\proc_open()" with "Are you sure you want to run this command?" | Answer `no`, then run the same command again with `--force` (for example `php artisan key:generate --force`). For `studio:create-admin`, give `--name`, `--email` and `--password` on the command line (step 8). |
 | A blank page or "500 Server Error" | Look at the last lines of `app/storage/logs/laravel-<date>.log`. Most often `.env` has a wrong database name or password, `APP_KEY` is empty, or `storage` is not writable (`chmod -R 775 storage bootstrap/cache`). |
 | "Composer detected issues in your platform: Your Composer dependencies require a PHP version >= 8.3" | The web or command-line PHP is too old. Repeat step 1, and use the full PHP path in commands (step 7). |
 | The home page works but every other page says "Not Found" | `.htaccess` is missing from the web folder. Check that `ls -la public_html/` shows it. |
