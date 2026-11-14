@@ -1,4 +1,4 @@
-@props(['variant' => 'neutral']) {{-- success | warning | danger | info | neutral --}}
+@props(['variant' => 'neutral', 'wrap' => false]) {{-- success | warning | danger | info | neutral; wrap = allow long text onto two lines --}}
 @php
     $variants = [
         'success' => 'border-success/30 bg-success-50 text-success',
@@ -8,7 +8,8 @@
         'neutral' => 'border-neutral-200 bg-neutral-50 text-neutral-600',
     ];
 @endphp
-<span {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-sm font-medium '.($variants[$variant] ?? $variants['neutral'])]) }}>
-    <span class="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true"></span>
+<span {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5 border px-2.5 py-0.5 text-sm font-medium '
+    .($wrap ? 'rounded-card text-left ' : 'whitespace-nowrap rounded-full ').($variants[$variant] ?? $variants['neutral'])]) }}>
+    <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-current" aria-hidden="true"></span>
     {{ $slot }}
 </span>

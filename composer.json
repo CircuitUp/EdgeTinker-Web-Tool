@@ -7,8 +7,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "bacon/bacon-qr-code": "^3.1",
+        "intervention/image": "^4.4",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "livewire/livewire": "^4.4",
+        "pragmarx/google2fa": "^9.1",
         "symfony/html-sanitizer": "^7.4"
     },
     "require-dev": {

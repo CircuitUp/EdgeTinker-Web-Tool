@@ -1,5 +1,5 @@
 @props([
-    'variant' => 'primary',   // primary | secondary | ghost | danger | inverse | outline-inverse
+    'variant' => 'primary',   // primary | secondary | ghost | danger | ghost-danger | inverse | outline-inverse
     'size' => 'md',           // sm | md | lg
     'href' => null,           // renders an <a> when set
     'type' => 'button',
@@ -12,6 +12,7 @@
         'secondary' => 'border border-primary-600 bg-white text-primary-700 hover:bg-primary-50 active:bg-primary-100',
         'ghost' => 'text-primary-700 hover:bg-primary-50 active:bg-primary-100',
         'danger' => 'bg-danger text-white hover:bg-danger/90',
+        'ghost-danger' => 'text-danger hover:bg-danger-50 active:bg-danger-50',
         'inverse' => 'bg-white text-primary-900 hover:bg-primary-50 active:bg-primary-100',
         'outline-inverse' => 'border border-white/70 text-white hover:bg-white/10 active:bg-white/20',
     ];

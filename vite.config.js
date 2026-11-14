@@ -5,7 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            // The public site and Content Studio are separate bundles: visitors
+            // never download the editor code.
+            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/css/studio.css', 'resources/js/studio.js'],
             refresh: true,
         }),
         tailwindcss(),

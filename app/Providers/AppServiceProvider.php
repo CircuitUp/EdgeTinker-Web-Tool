@@ -5,6 +5,10 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Search\MySqlProductSearch;
 use App\Search\ProductSearch;
+use App\Studio\ContentTypes\CategoryType;
+use App\Studio\ContentTypes\ContentTypeRegistry;
+use App\Studio\ContentTypes\ProductType;
+use App\Studio\ContentTypes\TagType;
 use App\Support\Currency;
 use App\Support\Settings;
 use Illuminate\Pagination\Paginator;
@@ -24,6 +28,17 @@ class AppServiceProvider extends ServiceProvider
 
         // Swap this binding to move search to a dedicated engine later.
         $this->app->bind(ProductSearch::class, MySqlProductSearch::class);
+
+        // Content that goes through the approval workflow. To add a new kind of
+        // content, write a ContentType class and register it here.
+        $this->app->singleton(ContentTypeRegistry::class, function () {
+            $registry = new ContentTypeRegistry;
+            foreach ([ProductType::class, CategoryType::class, TagType::class] as $type) {
+                $registry->register(new $type);
+            }
+
+            return $registry;
+        });
     }
 
     public function boot(): void

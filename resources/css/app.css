@@ -279,9 +279,35 @@
         margin-top: 2rem;
     }
 
+    /* The editor's "Heading" button produces an h1; inside page content it is styled as a section heading. */
+    .rich-text h1,
     .rich-text h2 {
+        color: var(--et-neutral-900);
         font-size: 1.5rem;
+        font-weight: 600;
         line-height: 2rem;
+        margin-top: 2rem;
+    }
+
+    .rich-text blockquote {
+        border-left: 4px solid var(--et-primary-200);
+        color: var(--et-neutral-600);
+        padding-left: 1rem;
+    }
+
+    .rich-text pre {
+        background: var(--et-neutral-900);
+        border-radius: var(--et-radius-card);
+        color: #ffffff;
+        font-family: var(--et-font-mono);
+        font-size: 0.875rem;
+        overflow-x: auto;
+        padding: 1rem;
+    }
+
+    .rich-text pre code {
+        background: transparent;
+        padding: 0;
     }
 
     .rich-text h3 {

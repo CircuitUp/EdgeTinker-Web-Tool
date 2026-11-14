@@ -2,7 +2,8 @@
     $currencyCode = currency()->code();
     $price = currency()->format($product->priceIn($currencyCode));
     $features = collect($product->key_features ?? [])->filter()->values();
-    $gallery = $product->images->map(fn ($image) => ['src' => $image->url, 'alt' => $image->alt])->values();
+    // Uploaded images use their resized WebP versions (1600 px is plenty for the zoom); placeholders use the file as is.
+    $gallery = $product->images->map(fn ($image) => ['src' => $image->sized(1600), 'alt' => $image->alt])->values();
     $firstImage = $gallery->first();
     $enquireUrl = route('contact', ['subject' => __('site.product.enquiry_subject', ['name' => $product->name, 'sku' => $product->sku])]);
     $seoDescription = $product->seo_description ?: $product->short_description;
@@ -17,8 +18,19 @@
         @if ($firstImage)
             <meta property="og:image" content="{{ $firstImage['src'] }}">
         @endif
-        <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
+        @if ($isPreview ?? false)
+            <meta name="robots" content="noindex, nofollow">
+        @else
+            <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
+        @endif
     </x-slot:head>
+
+    @if ($isPreview ?? false)
+        {{-- Shown only inside Content Studio's preview: this page is not live. --}}
+        <div class="bg-accent px-4 py-2 text-center text-base font-semibold text-neutral-900" role="status">
+            Preview only. This is how the page would look if the change were approved. It is not on the live site.
+        </div>
+    @endif
 
     <div class="border-b border-neutral-200 bg-neutral-50">
         <div class="container-page py-4">
@@ -200,10 +212,31 @@
 
                     <x-slot:documents>
                         <h2 class="sr-only">{{ __('site.product.documents') }}</h2>
-                        {{-- Documents are attached through the Content Studio media library (Phase 3). --}}
-                        <x-empty-state icon="book" :title="__('site.product.no_documents_title')" class="max-w-3xl">
-                            {{ __('site.product.no_documents_text') }}
-                        </x-empty-state>
+                        @if ($product->documents->isNotEmpty())
+                            <ul class="grid max-w-3xl gap-3">
+                                @foreach ($product->documents as $document)
+                                    <li>
+                                        <a href="{{ $document->media->url }}" download="{{ $document->media->original_name }}"
+                                           class="group flex items-center gap-4 rounded-card border border-neutral-200 bg-white p-4 hover:border-primary-600">
+                                            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-primary-100 text-primary-700">
+                                                <x-icon name="book" class="h-6 w-6" />
+                                            </span>
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block text-base font-semibold text-neutral-900 group-hover:text-primary-700">{{ $document->title }}</span>
+                                                <span class="block text-sm text-neutral-600">
+                                                    {{ $document->typeLabel() }} · <span class="font-mono uppercase">{{ pathinfo($document->media->original_name, PATHINFO_EXTENSION) }}</span> · {{ $document->media->humanSize() }}
+                                                </span>
+                                            </span>
+                                            <span class="text-sm font-semibold text-primary-700">{{ __('site.product.download') }}</span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <x-empty-state icon="book" :title="__('site.product.no_documents_title')" class="max-w-3xl">
+                                {{ __('site.product.no_documents_text') }}
+                            </x-empty-state>
+                        @endif
                     </x-slot:documents>
                 </x-tabs>
 

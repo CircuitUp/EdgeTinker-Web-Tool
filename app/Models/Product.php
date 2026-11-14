@@ -61,6 +61,11 @@ class Product extends Model
         return $this->hasMany(ProductSpec::class)->orderBy('sort_order');
     }
 
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ProductDocument::class)->orderBy('sort_order');
+    }
+
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
@@ -79,7 +84,7 @@ class Product extends Model
     /** Eager-loads what a product card needs. */
     public function scopeForCard(Builder $query): Builder
     {
-        return $query->with(['thumbnail', 'category:id,name,slug']);
+        return $query->with(['thumbnail.media', 'category:id,name,slug']);
     }
 
     /** Price in the given currency code, or null when not set ("price on request"). */

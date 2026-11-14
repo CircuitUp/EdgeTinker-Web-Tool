@@ -12,7 +12,7 @@ class ProductController extends Controller
     public function show(string $slug): View
     {
         $product = Product::query()
-            ->with(['category', 'images', 'specs', 'tags'])
+            ->with(['category', 'images.media', 'specs', 'tags', 'documents.media'])
             ->where('slug', $slug)
             ->firstOrFail();
 

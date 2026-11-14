@@ -8,7 +8,9 @@
 <article {{ $attributes->merge(['class' => 'group relative flex h-full flex-col overflow-hidden rounded-card border border-neutral-200 bg-white shadow-card transition-shadow hover:shadow-overlay has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-primary-600']) }}>
     <div class="aspect-square overflow-hidden border-b border-neutral-200 bg-neutral-50">
         @if ($thumbnail)
-            <img src="{{ $thumbnail->url }}" alt="{{ $thumbnail->alt }}" width="400" height="400" loading="lazy" decoding="async"
+            {{-- Uploaded images are served as resized WebP; the browser picks a size from srcset. --}}
+            <img src="{{ $thumbnail->sized(400) }}" alt="{{ $thumbnail->alt }}" width="400" height="400" loading="lazy" decoding="async"
+                 @if ($srcset = $thumbnail->srcset()) srcset="{{ $srcset }}" sizes="(min-width: 1024px) 300px, 50vw" @endif
                  class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105">
         @endif
     </div>

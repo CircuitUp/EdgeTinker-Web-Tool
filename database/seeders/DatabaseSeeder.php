@@ -15,5 +15,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DemoCatalogueSeeder::class,
         ]);
+
+        // A demo login with a published password must never exist on the live site.
+        if (! app()->isProduction()) {
+            $this->call(DemoUserSeeder::class);
+        }
     }
 }

@@ -104,6 +104,7 @@ return [
         'no_description' => 'A full description has not been added yet.',
         'no_specs_title' => 'No specifications yet',
         'no_specs_text' => 'Specifications for this product have not been published.',
+        'download' => 'Download',
         'no_documents_title' => 'No documents yet',
         'no_documents_text' => 'Datasheets, schematics, pinouts, 3D models and firmware for this product will be listed here.',
         'wiki_heading' => 'Documentation and guides',
