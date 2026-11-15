@@ -38,14 +38,21 @@
                                  class="absolute inset-0 h-full w-full object-cover"
                                  @if ($loop->first) fetchpriority="high" @else loading="lazy" @endif decoding="async">
                         @endif
-                        {{-- Primary 900 overlay keeps the white text readable over any image. --}}
-                        <div class="absolute inset-0 bg-linear-to-r from-primary-900 via-primary-900/90 to-primary-900/70 lg:via-primary-900/85 lg:to-primary-900/20" aria-hidden="true"></div>
+                        {{-- Overlays that keep the white text readable while letting the photo show in its own colours.
+                             Small screens: the text covers the whole image, so tint it evenly.
+                             Large screens: darken only the left side behind the text and leave the rest of the photo clear.
+                             Bottom: a light shade so the dots and arrows stay visible on bright photos. --}}
+                        <div class="absolute inset-0 bg-primary-900/65 lg:hidden" aria-hidden="true"></div>
+                        {{-- Strongest behind the text (left 15–45 %), fully clear from 70 % to the right edge. --}}
+                        <div class="absolute inset-0 hidden bg-linear-to-r from-primary-900/90 from-15% via-primary-900/60 via-45% to-transparent to-70% lg:block" aria-hidden="true"></div>
+                        <div class="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-neutral-900/45 to-transparent" aria-hidden="true"></div>
 
                         <div class="container-page relative flex h-full items-center pb-16">
-                            <div class="max-w-xl">
+                            {{-- A soft shadow behind the text keeps it legible where the photo is bright. --}}
+                            <div class="max-w-xl [text-shadow:0_2px_16px_rgb(15_23_42/0.55)]">
                                 <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">{{ $slide->heading }}</h2>
                                 @if ($slide->sub_text)
-                                    <p class="mt-4 text-lg text-primary-100 sm:text-xl">{{ $slide->sub_text }}</p>
+                                    <p class="mt-4 text-lg text-white sm:text-xl">{{ $slide->sub_text }}</p>
                                 @endif
                                 @if ($slide->button_label && $slide->button_url)
                                     <x-button :href="$slide->button_url" variant="inverse" size="lg" class="mt-8">
