@@ -41,10 +41,10 @@ class Library extends Component
         foreach ($this->uploads as $index => $upload) {
             // Decide the kind from the extension, then apply that kind's rules.
             $extension = strtolower($upload->getClientOriginalExtension());
-            $kind = in_array($extension, MediaLibrary::IMAGE_EXTENSIONS, true) ? Media::KIND_IMAGE : Media::KIND_DOCUMENT;
+            $kind = MediaLibrary::kindFor($extension);
 
             $validator = validator(['file' => $upload], ['file' => MediaLibrary::rules($kind)], [
-                'file.max' => ':name is too large (images up to 8 MB, documents up to 30 MB).',
+                'file.max' => ':name is too large (images up to 8 MB, documents and videos up to 30 MB).',
             ]);
 
             if ($validator->fails()) {

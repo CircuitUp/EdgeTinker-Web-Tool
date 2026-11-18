@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Livewire\Studio\Messages\Index as MessagesIndex;
 use App\Livewire\Studio\Pages\Form as PageForm;
 use App\Livewire\Studio\Settings as SettingsScreen;
-use App\Models\BannerSlide;
 use App\Models\ContactMessage;
 use App\Models\Media;
 use App\Models\Page;
@@ -167,31 +166,24 @@ class PagesAndContactTest extends TestCase
         $this->get('/services')->assertSee('What we build for you');
     }
 
-    public function test_the_home_page_editor_controls_slides_and_featured_products(): void
+    public function test_the_home_page_editor_controls_featured_products(): void
     {
         $category = $this->makeCategory('Boards');
         $first = $this->makeProduct($category, 'First Featured', ['is_featured' => true]);
         $second = $this->makeProduct($category, 'Second Featured');
         $third = $this->makeProduct($category, 'Third Featured');
-        BannerSlide::create(['heading' => 'Old slide', 'sort_order' => 1]);
 
         $payload = $this->pagePayload('home', [
-            'slides' => [
-                ['heading' => 'Brand new slide', 'sub_text' => 'Sub', 'button_label' => 'Go', 'button_url' => '/products', 'image' => [], 'image_alt' => ''],
-                ['heading' => 'Second new slide', 'sub_text' => '', 'button_label' => '', 'button_url' => 'https://example.com/x', 'image' => [], 'image_alt' => ''],
-            ],
             'featured_product_ids' => [$third->id, $second->id],
             'featured_heading' => 'Hand-picked boards',
         ]);
 
         app(RevisionService::class)->save($this->admin, 'page', PageType::idFor('home'), $payload, submit: true);
 
-        $this->assertSame(['Brand new slide', 'Second new slide'], BannerSlide::orderBy('sort_order')->pluck('heading')->all());
         $this->assertFalse($first->fresh()->is_featured, 'Products left off the list are no longer featured.');
         $this->assertTrue($second->fresh()->is_featured && $third->fresh()->is_featured);
 
         $this->get('/')->assertOk()
-            ->assertSee('Brand new slide')->assertDontSee('Old slide')
             ->assertSee('Hand-picked boards')
             ->assertSeeInOrder(['Third Featured', 'Second Featured'])   // the chosen order
             ->assertDontSee('First Featured');
@@ -202,7 +194,6 @@ class PagesAndContactTest extends TestCase
         $this->get('/')->assertOk()->assertDontSee('id="home-partners"', false);
 
         $payload = $this->pagePayload('home', [
-            'slides' => [['heading' => 'A slide', 'image' => []]], // the Home page needs at least one
             'partners_heading' => 'Trusted by',
             'partners' => [
                 ['name' => 'Acme Robotics', 'logo' => ['path' => 'placeholders/partner-1.svg']],
@@ -250,7 +241,6 @@ class PagesAndContactTest extends TestCase
         Queue::fake();
 
         Livewire::actingAs($this->admin)->test(PageForm::class, ['page' => 'home'])
-            ->call('addRow', 'slides')->set('form.content.slides.0.heading', 'A slide') // the Home page needs at least one
             ->call('addRow', 'partners')
             ->set('form.content.partners.0.name', 'Initech')
             ->set('uploads.partners.0.logo', UploadedFile::fake()->image('initech.png', 300, 100))
@@ -264,7 +254,7 @@ class PagesAndContactTest extends TestCase
     public function test_page_fields_are_validated(): void
     {
         $bad = $this->pagePayload('home', [
-            'slides' => [['heading' => '', 'button_url' => 'javascript:alert(1)', 'image' => ['path' => '../../secret.png']]],
+            'partners' => [['name' => '', 'logo' => ['path' => '../../secret.png']]],
             'categories_heading' => '',
             'featured_product_ids' => [999999],
         ]);
@@ -274,15 +264,10 @@ class PagesAndContactTest extends TestCase
             $this->fail('Invalid page content must be refused.');
         } catch (ValidationException $e) {
             $this->assertEqualsCanonicalizing([
-                'content.slides.0.heading', 'content.slides.0.button_url', 'content.slides.0.image.path',
+                'content.partners.0.name', 'content.partners.0.logo.path',
                 'content.categories_heading', 'content.featured_product_ids.0',
             ], array_keys($e->errors()));
         }
-
-        // Protocol-relative links (//evil.example) are refused as well.
-        $this->expectException(ValidationException::class);
-        app(RevisionService::class)->save($this->creator, 'page', PageType::idFor('home'),
-            $this->pagePayload('home', ['slides' => [['heading' => 'x', 'button_url' => '//evil.example']]]), submit: true);
     }
 
     public function test_pages_cannot_be_deleted(): void
@@ -301,12 +286,12 @@ class PagesAndContactTest extends TestCase
 
         $component = Livewire::actingAs($this->creator)->test(PageForm::class, ['page' => 'home'])
             ->assertSet('slug', 'home')
-            ->call('addRow', 'slides')
-            ->set('form.content.slides.0.heading', 'Uploaded slide')
-            ->set('uploads.slides.0.image', UploadedFile::fake()->image('hero.jpg', 1200, 600))
+            ->call('addRow', 'partners')
+            ->set('form.content.partners.0.name', 'Uploaded partner')
+            ->set('uploads.partners.0.logo', UploadedFile::fake()->image('logo.png', 300, 100))
             ->assertHasNoErrors();
 
-        $this->assertSame(Media::sole()->id, $component->get('form.content.slides.0.image.media_id'));
+        $this->assertSame(Media::sole()->id, $component->get('form.content.partners.0.logo.media_id'));
 
         // Only real image fields accept uploads.
         Livewire::actingAs($this->creator)->test(PageForm::class, ['page' => 'home'])
@@ -316,12 +301,12 @@ class PagesAndContactTest extends TestCase
 
         $revision = Revision::sole();
         $this->assertSame('page', $revision->entity_type);
-        $this->assertSame('Uploaded slide', $revision->payload['content']['slides'][0]['heading']);
-        $this->assertSame(0, BannerSlide::count(), 'Nothing is live until approved.');
+        $this->assertSame('Uploaded partner', $revision->payload['content']['partners'][0]['name']);
+        $this->get('/')->assertDontSee('alt="Uploaded partner"', false); // nothing is live until approved
 
-        // The preview renders the home page with the pending slide.
+        // The preview renders the home page with the pending partner.
         $this->actingAs($this->admin)->get(route('studio.revisions.preview', $revision))->assertOk()
-            ->assertSee('Uploaded slide')->assertSee('Preview only');
+            ->assertSee('alt="Uploaded partner"', false)->assertSee('Preview only');
     }
 
     public function test_services_deliverables_are_edited_one_per_line(): void

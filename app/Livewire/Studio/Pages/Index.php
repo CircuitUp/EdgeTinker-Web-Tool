@@ -23,7 +23,7 @@ class Index extends Component
             'title' => PageContent::TITLES[$slug],
             'url' => route($slug === 'home' ? 'home' : $slug),
             'about' => match ($slug) {
-                'home' => 'Hero slideshow, featured products and the text of each section.',
+                'home' => 'Featured products, partner logos and the text of each section. The banner has its own editor.',
                 'services' => 'Introduction, the service cards, the “how we work” steps and the enquiry panel.',
                 'contact' => 'Headings and introduction. The address, email, phone and map are in Site settings.',
             },

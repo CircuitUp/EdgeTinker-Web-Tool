@@ -14,6 +14,8 @@ use Throwable;
  * overrides the defaults field by field, so a page always renders even
  * before anyone has edited it.
  *
+ * The home page banner is not here: it has its own editor (BannerConfig).
+ *
  * Field types: text, textarea, lines (one item per line), icon, image,
  * products (a list of product ids), repeater (rows of sub-fields).
  */
@@ -65,16 +67,6 @@ class PageContent
     {
         return match ($slug) {
             'home' => [
-                ['key' => 'slides', 'group' => 'Hero slideshow', 'label' => 'Slides', 'type' => 'repeater', 'min_rows' => 1, 'max_rows' => 6, 'row_label' => 'Slide',
-                    'hint' => 'The home page opens with these. Three slides work best.',
-                    'fields' => [
-                        ['key' => 'heading', 'label' => 'Heading', 'type' => 'text', 'required' => true, 'max' => 120],
-                        ['key' => 'sub_text', 'label' => 'Sub-text', 'type' => 'textarea', 'max' => 300],
-                        ['key' => 'button_label', 'label' => 'Button text', 'type' => 'text', 'max' => 40],
-                        ['key' => 'button_url', 'label' => 'Button link', 'type' => 'link', 'max' => 255, 'hint' => 'A page on this site, e.g. /products, or a full https:// address.'],
-                        ['key' => 'image', 'label' => 'Background image', 'type' => 'image', 'hint' => 'Wide images (about 1920 × 900) work best. Text is shown over a purple overlay.'],
-                        ['key' => 'image_alt', 'label' => 'Image description for screen readers', 'type' => 'text', 'max' => 255, 'hint' => 'Leave empty if the image is purely decorative.'],
-                    ]],
                 ['key' => 'featured_product_ids', 'group' => 'Featured products', 'label' => 'Products to feature', 'type' => 'products', 'max_rows' => 12,
                     'hint' => 'Shown as cards on the home page, in this order.'],
                 ['key' => 'featured_heading', 'group' => 'Featured products', 'label' => 'Heading', 'type' => 'text', 'required' => true, 'max' => 120],
@@ -138,8 +130,7 @@ class PageContent
     {
         return match ($slug) {
             'home' => [
-                // Slides and featured products live in their own tables; listed here so the editor knows the fields.
-                'slides' => [],
+                // Featured products are flagged on the products themselves; listed here so the editor knows the field.
                 'featured_product_ids' => [],
                 'categories_heading' => 'Browse by category',
                 'categories_intro' => 'Boards and modules for every stage of an embedded design.',

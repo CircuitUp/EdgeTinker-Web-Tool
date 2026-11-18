@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Search\MySqlProductSearch;
 use App\Search\ProductSearch;
+use App\Studio\ContentTypes\BannerType;
 use App\Studio\ContentTypes\CategoryType;
 use App\Studio\ContentTypes\ContentTypeRegistry;
 use App\Studio\ContentTypes\PageType;
@@ -36,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
         // content, write a ContentType class and register it here.
         $this->app->singleton(ContentTypeRegistry::class, function () {
             $registry = new ContentTypeRegistry;
-            foreach ([ProductType::class, CategoryType::class, TagType::class, WikiPageType::class, PageType::class] as $type) {
+            foreach ([ProductType::class, CategoryType::class, TagType::class, WikiPageType::class, PageType::class, BannerType::class] as $type) {
                 $registry->register(new $type);
             }
 

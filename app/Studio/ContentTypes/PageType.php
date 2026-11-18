@@ -2,7 +2,6 @@
 
 namespace App\Studio\ContentTypes;
 
-use App\Models\BannerSlide;
 use App\Models\Media;
 use App\Models\Page;
 use App\Models\Product;
@@ -122,7 +121,6 @@ class PageType extends ContentType
     {
         return [
             'content.*.*.button_url.regex' => 'The button link must be a page on this site (starting with /) or a full https:// address.',
-            'content.slides.min' => 'The slideshow needs at least one slide.',
             'content.partners.*.logo.media_id.required_without' => 'Upload a logo for this partner.',
             'required' => 'This field is required.',
         ];
@@ -161,18 +159,7 @@ class PageType extends ContentType
         $content = array_replace(PageContent::defaults($page->slug), array_intersect_key($page->content ?? [], PageContent::defaults($page->slug)));
 
         if ($page->slug === 'home') {
-            // Slides and the featured flag are stored in their own tables; present them as page fields.
-            $content['slides'] = BannerSlide::active()->get()->map(function (BannerSlide $slide) {
-                $media = $slide->image_path ? Media::where('path', $slide->image_path)->first() : null;
-
-                return [
-                    'heading' => $slide->heading, 'sub_text' => (string) $slide->sub_text,
-                    'button_label' => (string) $slide->button_label, 'button_url' => (string) $slide->button_url,
-                    'image' => ['media_id' => $media?->id, 'path' => $media ? null : $slide->image_path],
-                    'image_alt' => $slide->image_alt,
-                ];
-            })->all();
-
+            // The featured flag is stored on the products; present it as a page field.
             $featured = Product::featured()->latest()->pluck('id')->all();
             $order = array_flip($content['featured_product_ids'] ?? []);
             usort($featured, fn ($a, $b) => ($order[$a] ?? PHP_INT_MAX) <=> ($order[$b] ?? PHP_INT_MAX));
@@ -188,23 +175,9 @@ class PageType extends ContentType
         $content = $payload['content'];
 
         if ($payload['slug'] === 'home') {
-            $media = Media::whereIn('id', collect($content['slides'])->pluck('image.media_id')->filter())->get()->keyBy('id');
-
-            BannerSlide::query()->delete();
-            foreach ($content['slides'] as $order => $slide) {
-                BannerSlide::create([
-                    'heading' => $slide['heading'], 'sub_text' => $slide['sub_text'] ?: null,
-                    'button_label' => $slide['button_label'] ?: null, 'button_url' => $slide['button_url'] ?: null,
-                    'image_path' => $slide['image']['media_id'] ? ($media[$slide['image']['media_id']]->path ?? null) : $slide['image']['path'],
-                    'image_alt' => $slide['image_alt'], 'sort_order' => $order + 1, 'is_active' => true,
-                ]);
-            }
-
             // The list on this form is the complete set of featured products.
             Product::query()->whereNotIn('id', $content['featured_product_ids'])->where('is_featured', true)->update(['is_featured' => false]);
             Product::query()->whereIn('id', $content['featured_product_ids'])->update(['is_featured' => true]);
-
-            unset($content['slides']); // kept in banner_slides, not duplicated here
         }
 
         $page->fill(['content' => $content, 'seo_title' => $payload['seo_title'], 'seo_description' => $payload['seo_description']])->save();

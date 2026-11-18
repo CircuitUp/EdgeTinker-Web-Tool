@@ -10,7 +10,7 @@
                 <p class="mt-2 text-base font-medium text-neutral-900">Drop files here, or click to choose</p>
                 <p class="text-sm text-neutral-600">Images: JPG, PNG, WebP, GIF up to 8 MB. Documents: PDF, ZIP, STEP, STL, BIN, HEX, UF2, TXT, CSV up to 30 MB.</p>
                 <input type="file" multiple wire:model="uploads" aria-label="Upload files"
-                       accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.zip,.step,.stp,.stl,.bin,.hex,.uf2,.txt,.csv" class="absolute inset-0 h-full w-full cursor-pointer opacity-0">
+                       accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.pdf,.zip,.step,.stp,.stl,.bin,.hex,.uf2,.txt,.csv" class="absolute inset-0 h-full w-full cursor-pointer opacity-0">
                 <p wire:loading wire:target="uploads" class="mt-2 text-sm font-semibold text-primary-700" role="status">Uploading…</p>
             </div>
             @foreach ($errors->get('uploads') as $message)
@@ -28,9 +28,10 @@
                 <div>
                     <label for="media-kind" class="text-sm font-medium text-neutral-900">Show</label>
                     <select id="media-kind" wire:model.live="kind" class="mt-1 block min-h-11 rounded-control border border-neutral-300 bg-white px-3 text-base hover:border-neutral-400">
-                        <option value="all">Images and documents</option>
+                        <option value="all">All files</option>
                         <option value="image">Images only</option>
                         <option value="document">Documents only</option>
+                        <option value="video">Videos only</option>
                     </select>
                 </div>
             </div>

@@ -1,0 +1,191 @@
+/* ==========================================================================
+   Home page banner (rendered from BannerConfig).
+   Shared by the live site and the Content Studio banner editor.
+
+   Values come from inline custom properties written by
+   App\Support\Banner\BannerStyles (PHP) and resources/js/banner/styles.js
+   (editor). Each responsive value exists three times (-m mobile, -t tablet,
+   -d desktop); container queries on the banner's own width pick one, so the
+   editor canvas behaves like the real page at each breakpoint.
+   ========================================================================== */
+
+.bnr {
+    container: bnr / inline-size;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--et-primary-900);
+}
+
+.bnr-viewport {
+    position: relative;
+    height: var(--bnr-h-m);
+}
+
+.bnr-slide {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    isolation: isolate; /* element z-indexes stay inside the slide, under the slideshow controls */
+}
+
+.bnr-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--bg-fit, cover);
+    object-position: var(--bg-pos, 50% 50%);
+}
+
+.bnr-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--ov-m);
+    opacity: var(--ovo-m);
+    mix-blend-mode: var(--ovb-m);
+}
+
+/* A light shade at the bottom so the slide dots and arrows stay visible on bright photos. */
+.bnr-scrim {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 7rem;
+    pointer-events: none;
+    background: linear-gradient(0deg, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0));
+}
+
+/* The frame elements are positioned in: the page's content column ("container", lines up with
+   the rest of the page) or the whole banner ("full"). */
+.bnr-frame {
+    position: relative;
+    height: 100%;
+}
+
+.bnr-frame--container {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+}
+
+.bnr-area {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Elements without a position flow in this column, vertically centred (the original layout). */
+.bnr-stack {
+    width: 100%;
+    max-width: 36rem;
+    margin-bottom: 4rem;
+}
+
+.bnr-el {
+    position: var(--pos-m);
+    left: var(--l-m);
+    top: var(--t-m);
+    width: var(--w-m);
+    transform: var(--tf-m);
+    margin: var(--mt-m) 0 0;
+    font-size: var(--fs-m);
+    line-height: var(--lh-m);
+    white-space: pre-line;
+    overflow-wrap: break-word;
+}
+
+.bnr-text {
+    display: block;
+}
+
+.bnr-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-style: solid;
+    color: var(--fg);
+    background-color: var(--bg);
+    border-color: var(--bd);
+    white-space: nowrap;
+    transition-property: color, background-color, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bnr-btn:hover,
+.bnr-btn.is-hover {
+    color: var(--fg-h);
+    background-color: var(--bg-h);
+    border-color: var(--bd-h);
+}
+
+.bnr-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+}
+
+@container bnr (min-width: 640px) {
+    .bnr-viewport {
+        height: var(--bnr-h-t);
+    }
+
+    .bnr-overlay {
+        background: var(--ov-t);
+        opacity: var(--ovo-t);
+        mix-blend-mode: var(--ovb-t);
+    }
+
+    .bnr-frame--container {
+        padding-inline: 1.5rem;
+    }
+
+    .bnr-el {
+        position: var(--pos-t);
+        left: var(--l-t);
+        top: var(--t-t);
+        width: var(--w-t);
+        transform: var(--tf-t);
+        margin-top: var(--mt-t);
+        font-size: var(--fs-t);
+        line-height: var(--lh-t);
+    }
+}
+
+@container bnr (min-width: 1024px) {
+    .bnr-viewport {
+        height: var(--bnr-h-d);
+    }
+
+    .bnr-overlay {
+        background: var(--ov-d);
+        opacity: var(--ovo-d);
+        mix-blend-mode: var(--ovb-d);
+    }
+
+    .bnr-frame--container {
+        padding-inline: 2rem;
+    }
+
+    .bnr-el {
+        position: var(--pos-d);
+        left: var(--l-d);
+        top: var(--t-d);
+        width: var(--w-d);
+        transform: var(--tf-d);
+        margin-top: var(--mt-d);
+        font-size: var(--fs-d);
+        line-height: var(--lh-d);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bnr-btn {
+        transition: none;
+    }
+}

@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\BannerSlide;
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\Banner\BannerConfig;
 use App\Support\Settings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -38,11 +39,12 @@ class HomePageTest extends TestCase
             ->assertSee(__('site.home.featured_empty_title'));
     }
 
-    public function test_home_page_shows_slides_categories_and_only_featured_products(): void
+    public function test_home_page_shows_the_banner_categories_and_only_featured_products(): void
     {
         $category = Category::create(['name' => 'Sensor Boards', 'slug' => 'sensor-boards', 'tagline' => 'Sense things.', 'sort_order' => 1]);
-        BannerSlide::create(['heading' => 'First slide heading', 'sort_order' => 1]);
-        BannerSlide::create(['heading' => 'Hidden slide heading', 'sort_order' => 2, 'is_active' => false]);
+        $config = BannerConfig::fromLegacySlides([['heading' => 'First slide heading', 'sub_text' => 'Hidden slide heading']]);
+        $config['slides'][0]['elements'][1]['visible'] = false; // hidden in the banner editor
+        Banner::home()->update(['config' => $config]);
         $this->product($category, ['name' => 'Featured Widget', 'is_featured' => true]);
         $this->product($category, ['name' => 'Ordinary Widget']);
 

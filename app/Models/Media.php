@@ -13,6 +13,9 @@ class Media extends Model
 
     public const KIND_DOCUMENT = 'document';
 
+    /** Short MP4/WebM clips, used as home banner backgrounds. */
+    public const KIND_VIDEO = 'video';
+
     /** Widths (px) of the WebP versions generated for each uploaded image. */
     public const VARIANT_WIDTHS = [400, 800, 1600];
 

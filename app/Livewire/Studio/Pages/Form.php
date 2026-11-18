@@ -37,7 +37,7 @@ class Form extends Component
     /** seo_title, seo_description and content (one entry per schema field). */
     public array $form = [];
 
-    /** Pending image uploads, keyed like the field they belong to: uploads.slides.0.image */
+    /** Pending image uploads, keyed like the field they belong to: uploads.partners.0.logo */
     public array $uploads = [];
 
     public string $productToAdd = '';
@@ -134,7 +134,7 @@ class Form extends Component
 
     // ── Images ───────────────────────────────────────────────────────────────
 
-    /** Fires when a file is chosen. $name is the field path, e.g. "slides.0.image". */
+    /** Fires when a file is chosen. $name is the field path, e.g. "partners.0.logo". */
     public function updatedUploads($value, string $name): void
     {
         $library = app(MediaLibrary::class);

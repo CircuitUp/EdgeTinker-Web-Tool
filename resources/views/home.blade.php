@@ -1,7 +1,15 @@
-{{-- Section text comes from Content Studio → Pages → Home ($content); slides and featured products are chosen there too. --}}
+{{-- Section text comes from Content Studio → Pages → Home ($content); featured products are chosen there too.
+     The banner comes from Content Studio → Home banner ($banner, prepared by BannerPresenter). --}}
 <x-layouts.site :title="$seo['title'] ?? null" :description="$seo['description'] ?? null" :preview="$isPreview ?? false">
-    @unless ($isPreview ?? false)
-        <x-slot:head>
+    <x-slot:head>
+        {{-- Fonts chosen in the banner editor, self-hosted. Preloaded so the headline does not change font after it appears. --}}
+        @foreach ($banner['fonts']['preload'] as $font)
+            <link rel="preload" href="{{ $font }}" as="font" type="font/woff2" crossorigin>
+        @endforeach
+        @foreach ($banner['fonts']['css'] as $stylesheet)
+            <link rel="stylesheet" href="{{ $stylesheet }}">
+        @endforeach
+        @unless ($isPreview ?? false)
             {{-- Tells search engines who runs the site and that it has a search box. --}}
             <script type="application/ld+json">{!! json_encode([
                 '@context' => 'https://schema.org',
@@ -11,93 +19,13 @@
                         'potentialAction' => ['@type' => 'SearchAction', 'target' => route('search').'?q={search_term_string}', 'query-input' => 'required name=search_term_string']],
                 ],
             ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
-        </x-slot:head>
-    @endunless
+        @endunless
+    </x-slot:head>
 
     <h1 class="sr-only">{{ setting('site.name') }} – {{ setting('site.tagline') }}</h1>
 
-    {{-- 1. Hero slideshow ------------------------------------------------- --}}
-    @if ($slides->isNotEmpty())
-        <section x-data="slideshow({ count: {{ $slides->count() }}, interval: {{ (int) config('edgetinker.home.slide_interval_ms') }} })"
-                 class="on-dark relative overflow-hidden bg-primary-900"
-                 aria-roledescription="carousel" aria-label="{{ __('site.home.slideshow_label') }}"
-                 @mouseenter="setHovered(true)" @mouseleave="setHovered(false)"
-                 @focusin="setFocused(true)" @focusout="setFocused(false)"
-                 @keydown.arrow-left="previous()" @keydown.arrow-right="next()"
-                 @touchstart.passive="onTouchStart($event)" @touchend.passive="onTouchEnd($event)">
-
-            <div class="relative h-[30rem] sm:h-[32rem] lg:h-[36rem]" :aria-live="playing ? 'off' : 'polite'">
-                @foreach ($slides as $index => $slide)
-                    <div x-show="current === {{ $index }}" @if (! $loop->first) x-cloak @endif
-                         x-transition:enter="transition-opacity duration-700" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                         x-transition:leave="transition-opacity duration-700" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                         class="absolute inset-0" role="group" aria-roledescription="slide"
-                         aria-label="{{ __('site.home.slide_of', ['current' => $index + 1, 'total' => $slides->count()]) }}">
-                        @if ($slide->image_url)
-                            <img src="{{ $slide->image_url }}" alt="{{ $slide->image_alt }}" width="1920" height="900"
-                                 class="absolute inset-0 h-full w-full object-cover"
-                                 @if ($loop->first) fetchpriority="high" @else loading="lazy" @endif decoding="async">
-                        @endif
-                        {{-- Overlays that keep the white text readable while letting the photo show in its own colours.
-                             Small screens: the text covers the whole image, so tint it evenly.
-                             Large screens: darken only the left side behind the text and leave the rest of the photo clear.
-                             Bottom: a light shade so the dots and arrows stay visible on bright photos. --}}
-                        <div class="absolute inset-0 bg-primary-900/65 lg:hidden" aria-hidden="true"></div>
-                        {{-- Strongest behind the text (left 15–45 %), fully clear from 70 % to the right edge. --}}
-                        <div class="absolute inset-0 hidden bg-linear-to-r from-primary-900/90 from-15% via-primary-900/60 via-45% to-transparent to-70% lg:block" aria-hidden="true"></div>
-                        <div class="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-neutral-900/45 to-transparent" aria-hidden="true"></div>
-
-                        <div class="container-page relative flex h-full items-center pb-16">
-                            {{-- A soft shadow behind the text keeps it legible where the photo is bright. --}}
-                            <div class="max-w-xl [text-shadow:0_2px_16px_rgb(15_23_42/0.55)]">
-                                <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">{{ $slide->heading }}</h2>
-                                @if ($slide->sub_text)
-                                    <p class="mt-4 text-lg text-white sm:text-xl">{{ $slide->sub_text }}</p>
-                                @endif
-                                @if ($slide->button_label && $slide->button_url)
-                                    <x-button :href="$slide->button_url" variant="inverse" size="lg" class="mt-8">
-                                        {{ $slide->button_label }} <x-icon name="arrow-right" />
-                                    </x-button>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            @if ($slides->count() > 1)
-                @php $control = 'inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/50 bg-primary-900/60 text-white transition-colors hover:bg-white/15'; @endphp
-                <div class="absolute inset-x-0 bottom-5">
-                    <div class="container-page flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-1">
-                            @foreach ($slides as $index => $slide)
-                                <button type="button" class="group inline-flex h-11 w-8 items-center justify-center" @click="goTo({{ $index }})"
-                                        :aria-current="current === {{ $index }} ? 'true' : 'false'">
-                                    <span class="h-2.5 rounded-full transition-all" :class="current === {{ $index }} ? 'w-6 bg-white' : 'w-2.5 bg-white/50 group-hover:bg-white/80'"></span>
-                                    <span class="sr-only">{{ __('site.home.go_to_slide', ['number' => $index + 1]) }}</span>
-                                </button>
-                            @endforeach
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            {{-- Not shown when the visitor prefers reduced motion: the slideshow never auto-plays then. --}}
-                            <button type="button" class="{{ $control }}" @click="togglePlay()" x-show="!reducedMotion">
-                                <span x-show="playing"><x-icon name="pause" class="h-4 w-4" /></span>
-                                <span x-show="!playing" x-cloak><x-icon name="play" class="h-4 w-4" /></span>
-                                <span class="sr-only" x-text="playing ? @js(__('site.home.pause')) : @js(__('site.home.play'))">{{ __('site.home.pause') }}</span>
-                            </button>
-                            <button type="button" class="{{ $control }}" @click="previous()">
-                                <x-icon name="chevron-left" /><span class="sr-only">{{ __('site.home.previous_slide') }}</span>
-                            </button>
-                            <button type="button" class="{{ $control }}" @click="next()">
-                                <x-icon name="chevron-right" /><span class="sr-only">{{ __('site.home.next_slide') }}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        </section>
-    @endif
+    {{-- 1. Hero banner (slideshow) ------------------------------------------ --}}
+    <x-banner.hero :banner="$banner" />
 
     {{-- 2. Category tiles ------------------------------------------------- --}}
     @if ($categories->isNotEmpty())

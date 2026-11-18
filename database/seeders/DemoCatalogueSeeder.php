@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\BannerSlide;
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Tag;
+use App\Support\Banner\BannerConfig;
 use App\Support\PlaceholderArt;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
@@ -50,15 +51,15 @@ class DemoCatalogueSeeder extends Seeder
             ],
         ];
 
+        $rows = [];
         foreach ($slides as $i => $slide) {
             $path = 'placeholders/slide-'.($i + 1).'.svg';
             File::put(public_path($path), PlaceholderArt::slide($i));
-
-            BannerSlide::updateOrCreate(
-                ['sort_order' => $i + 1],
-                $slide + ['image_path' => $path, 'image_alt' => '', 'is_active' => true],
-            );
+            $rows[] = $slide + ['image_path' => $path, 'image_alt' => ''];
         }
+
+        // The banner in its default design (the same as the original hard-coded one).
+        Banner::updateOrCreate(['key' => Banner::HOME], ['config' => BannerConfig::fromLegacySlides($rows)]);
     }
 
     /** @return array<string, Category> keyed by slug */

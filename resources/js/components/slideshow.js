@@ -40,7 +40,19 @@ export default ({ count = 0, interval = 6000 } = {}) => ({
         return this.count > 1 && this.playing && !this.hovered && !this.focused && !document.hidden;
     },
 
+    /** Background videos only play while the slideshow is allowed to move. */
+    syncVideos() {
+        this.$el.querySelectorAll('video').forEach((video) => {
+            if (this.playing && !document.hidden) {
+                video.play()?.catch(() => {});
+            } else {
+                video.pause();
+            }
+        });
+    },
+
     restart() {
+        this.syncVideos();
         clearInterval(this.timer);
         this.timer = null;
         if (this.shouldRun()) {

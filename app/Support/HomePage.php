@@ -2,29 +2,32 @@
 
 namespace App\Support;
 
-use App\Models\BannerSlide;
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Media;
 use App\Models\Product;
+use App\Support\Banner\BannerConfig;
+use App\Support\Banner\BannerPresenter;
 use Illuminate\Support\Facades\Cache;
 
 /** Gathers everything the home page shows. Also used to preview a pending change to the page. */
 class HomePage
 {
-    public const SLIDES_CACHE_KEY = 'home.data';
+    public const BANNER_CACHE_KEY = 'home.data';
 
     /**
      * @param  array|null  $override  page content from a pending revision (for the Content Studio
      *                                preview); null renders what is live
+     * @param  array|null  $banner  a banner config from a pending revision or the banner editor; null = the live banner
      */
-    public static function data(?array $override = null): array
+    public static function data(?array $override = null, ?array $banner = null): array
     {
         $pages = app(PageContent::class);
         $content = $override === null ? $pages->get('home') : array_replace(PageContent::defaults('home'), $override);
 
         return [
             'content' => $content,
-            'slides' => $override === null ? self::liveSlides() : self::slidesFrom($content['slides'] ?? []),
+            'banner' => $banner === null ? self::liveBanner() : app(BannerPresenter::class)->present(BannerConfig::normalise($banner)),
             'categories' => Category::navigation(),
             'featured' => self::featured($override === null ? null : ($content['featured_product_ids'] ?? [])),
             'services' => $pages->get('services')['services'],
@@ -34,13 +37,13 @@ class HomePage
     }
 
     /**
-     * The live slides, cached as plain rows. Slides only change when a Home
-     * page revision is approved, which clears this cache (SiteCache::flush()).
+     * The live banner, ready for the template and cached. It only changes when
+     * a banner revision is approved, which clears this cache (SiteCache::flush()).
      */
-    private static function liveSlides()
+    private static function liveBanner(): array
     {
-        return BannerSlide::hydrate(Cache::remember(self::SLIDES_CACHE_KEY, now()->addHours(6),
-            fn () => BannerSlide::active()->get()->map(fn (BannerSlide $slide) => $slide->getAttributes())->all()));
+        return Cache::remember(self::BANNER_CACHE_KEY, now()->addHours(6),
+            fn () => app(BannerPresenter::class)->present(Banner::home()->design()));
     }
 
     /** Featured products, in the order chosen on the Home page editor (others follow, newest first). */
@@ -86,20 +89,5 @@ class HomePage
         }
 
         return $partners;
-    }
-
-    /** Unsaved slide models built from a revision payload. */
-    private static function slidesFrom(array $rows)
-    {
-        $media = Media::whereIn('id', collect($rows)->pluck('image.media_id')->filter())->get()->keyBy('id');
-
-        return collect($rows)->map(fn (array $row) => new BannerSlide([
-            'heading' => $row['heading'] ?? '',
-            'sub_text' => $row['sub_text'] ?? null,
-            'button_label' => $row['button_label'] ?? null,
-            'button_url' => $row['button_url'] ?? null,
-            'image_path' => ($row['image']['media_id'] ?? null) ? ($media[$row['image']['media_id']]->path ?? null) : ($row['image']['path'] ?? null),
-            'image_alt' => $row['image_alt'] ?? '',
-        ]));
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Studio;
 
 use App\Jobs\GenerateImageVariants;
-use App\Models\BannerSlide;
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Media;
 use App\Models\ProductDocument;
@@ -29,24 +29,52 @@ class MediaLibrary
 
     public const DOCUMENT_EXTENSIONS = ['pdf', 'zip', 'step', 'stp', 'stl', 'bin', 'hex', 'uf2', 'txt', 'csv'];
 
+    public const VIDEO_EXTENSIONS = ['mp4', 'webm'];
+
     public const MAX_IMAGE_KB = 8 * 1024;       // 8 MB
 
     public const MAX_DOCUMENT_KB = 30 * 1024;   // 30 MB
 
+    public const MAX_VIDEO_KB = 30 * 1024;      // 30 MB
+
     /** Validation rules for one uploaded file of the given kind. */
     public static function rules(string $kind): array
     {
-        return $kind === Media::KIND_IMAGE
-            ? ['required', 'file', 'max:'.self::MAX_IMAGE_KB, 'mimes:'.implode(',', self::IMAGE_EXTENSIONS), 'dimensions:max_width=8000,max_height=8000']
-            : ['required', 'file', 'max:'.self::MAX_DOCUMENT_KB, 'extensions:'.implode(',', self::DOCUMENT_EXTENSIONS),
+        return match ($kind) {
+            Media::KIND_IMAGE => ['required', 'file', 'max:'.self::MAX_IMAGE_KB, 'mimes:'.implode(',', self::IMAGE_EXTENSIONS), 'dimensions:max_width=8000,max_height=8000'],
+            Media::KIND_VIDEO => ['required', 'file', 'max:'.self::MAX_VIDEO_KB, 'extensions:'.implode(',', self::VIDEO_EXTENSIONS), 'mimetypes:video/mp4,video/webm'],
+            default => ['required', 'file', 'max:'.self::MAX_DOCUMENT_KB, 'extensions:'.implode(',', self::DOCUMENT_EXTENSIONS),
                 // Detected content types for the allowed document formats (firmware and CAD files are opaque binaries).
-                'mimetypes:application/pdf,application/zip,application/x-zip-compressed,application/octet-stream,text/plain,text/csv,model/stl,application/sla,application/vnd.ms-pki.stl,model/step,application/step'];
+                'mimetypes:application/pdf,application/zip,application/x-zip-compressed,application/octet-stream,text/plain,text/csv,model/stl,application/sla,application/vnd.ms-pki.stl,model/step,application/step'],
+        };
+    }
+
+    /** @return list<string> */
+    public static function extensionsFor(string $kind): array
+    {
+        return match ($kind) {
+            Media::KIND_IMAGE => self::IMAGE_EXTENSIONS,
+            Media::KIND_VIDEO => self::VIDEO_EXTENSIONS,
+            default => self::DOCUMENT_EXTENSIONS,
+        };
+    }
+
+    /** The kind a file belongs to, decided from its extension. */
+    public static function kindFor(string $extension): string
+    {
+        $extension = strtolower($extension);
+
+        return match (true) {
+            in_array($extension, self::IMAGE_EXTENSIONS, true) => Media::KIND_IMAGE,
+            in_array($extension, self::VIDEO_EXTENSIONS, true) => Media::KIND_VIDEO,
+            default => Media::KIND_DOCUMENT,
+        };
     }
 
     public function store(UploadedFile $file, string $kind, ?User $user): Media
     {
         $extension = strtolower($file->getClientOriginalExtension());
-        $allowed = $kind === Media::KIND_IMAGE ? self::IMAGE_EXTENSIONS : self::DOCUMENT_EXTENSIONS;
+        $allowed = self::extensionsFor($kind);
 
         if (! in_array($extension, $allowed, true)) {
             throw ValidationException::withMessages(['file' => 'This type of file is not allowed.']);
@@ -101,8 +129,8 @@ class MediaLibrary
         if (Category::where('image_path', $media->path)->exists()) {
             $uses[] = 'Category image';
         }
-        if (BannerSlide::where('image_path', $media->path)->exists()) {
-            $uses[] = 'Home page slide';
+        if (Banner::usesMedia($media)) {
+            $uses[] = 'Home page banner';
         }
         if (setting('site.logo_path') === $media->path) {
             $uses[] = 'Site logo';

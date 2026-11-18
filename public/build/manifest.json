@@ -56,7 +56,7 @@
     "src": "node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-vietnamese-wght-normal.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DhzjkMCr.css",
+    "file": "assets/app-DLVtdPLZ.css",
     "name": "app",
     "names": [
       "app.css"
@@ -80,7 +80,7 @@
     ]
   },
   "resources/css/studio.css": {
-    "file": "assets/studio-O9jlqXrd.css",
+    "file": "assets/studio-DI1AaLjX.css",
     "name": "studio",
     "names": [
       "studio.css"
@@ -104,7 +104,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DqO0fCq-.js",
+    "file": "assets/app-CwzwTLo3.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

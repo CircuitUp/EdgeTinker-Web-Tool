@@ -3,6 +3,7 @@
 @import '@fontsource-variable/jetbrains-mono/wght.css';
 
 @import 'tailwindcss';
+@import './banner.css';
 
 @source '../views';
 @source '../../app';
