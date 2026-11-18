@@ -111,6 +111,23 @@ class SeoAndHardeningTest extends TestCase
         $this->get('/')->assertSee('"@type":"WebSite"', false)->assertSee('"@type":"Organization"', false);
     }
 
+    public function test_structured_data_is_valid_json_with_a_schema_org_context(): void
+    {
+        $category = $this->makeCategory('Sensor Boards');
+        $this->makeProduct($category, 'Meta Board', ['slug' => 'meta-board']);
+
+        foreach (['/', '/product/meta-board'] as $url) {
+            $html = $this->get($url)->assertOk()->getContent();
+            $this->assertSame(1, preg_match('#<script type="application/ld\+json">(.*?)</script>#s', $html, $match), "$url has structured data");
+            $data = json_decode($match[1], true);
+
+            $this->assertIsArray($data, "$url structured data is valid JSON");
+            // Regression: Blade once read "@context" as its own directive and printed PHP code into the key.
+            $this->assertSame('https://schema.org', $data['@context'] ?? null, "$url declares the schema.org context");
+            $this->assertStringNotContainsString('<?php', $match[1]);
+        }
+    }
+
     // ── Security headers ─────────────────────────────────────────────────────
 
     public function test_every_response_carries_security_headers(): void

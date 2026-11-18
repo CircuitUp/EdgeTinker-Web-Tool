@@ -11,8 +11,9 @@
         @endforeach
         @unless ($isPreview ?? false)
             {{-- Tells search engines who runs the site and that it has a search box. --}}
+            {{-- '@'.'context': written in two parts because Blade would read @context as its own directive and print PHP code here. --}}
             <script type="application/ld+json">{!! json_encode([
-                '@context' => 'https://schema.org',
+                '@'.'context' => 'https://schema.org',
                 '@graph' => [
                     ['@type' => 'Organization', 'name' => setting('site.name'), 'url' => route('home'), 'description' => setting('site.tagline')],
                     ['@type' => 'WebSite', 'name' => setting('site.name'), 'url' => route('home'),
