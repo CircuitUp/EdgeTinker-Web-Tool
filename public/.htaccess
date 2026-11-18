@@ -1,5 +1,10 @@
 # EdgeTinker: web server rules (Apache / LiteSpeed, as used by Hostinger).
 
+# The web app manifest (favicons for Android home screens) needs its own content type.
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

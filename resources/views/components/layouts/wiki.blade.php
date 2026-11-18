@@ -19,7 +19,7 @@
     <title>{{ $fullTitle }}</title>
     <meta name="description" content="{{ $description ?? __('site.wiki.tagline') }}">
     <link rel="canonical" href="{{ url()->current() }}">
-    <meta name="theme-color" content="#2E1065">
+    @include('components.favicons')
     <meta property="og:site_name" content="{{ $siteName }} {{ __('site.wiki.title') }}">
     <meta property="og:type" content="article">
     <meta property="og:title" content="{{ $title ?: __('site.wiki.title') }}">

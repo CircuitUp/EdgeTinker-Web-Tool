@@ -21,7 +21,7 @@
     <title>{{ $fullTitle }}</title>
     <meta name="description" content="{{ $metaDescription }}">
     <link rel="canonical" href="{{ url()->current() }}">
-    <meta name="theme-color" content="#2E1065">
+    @include('components.favicons')
 
     {{-- How the page appears when its link is shared (Open Graph / social cards). --}}
     <meta property="og:site_name" content="{{ $siteName }}">

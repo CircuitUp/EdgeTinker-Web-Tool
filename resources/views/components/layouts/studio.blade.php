@@ -34,6 +34,7 @@
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Content Studio' }} | Content Studio</title>
+    @include('components.favicons')
     @vite(['resources/css/studio.css', 'resources/js/studio.js'])
     @livewireStyles
 </head>

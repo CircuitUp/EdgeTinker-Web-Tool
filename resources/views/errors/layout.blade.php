@@ -10,6 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
     <title>@yield('title') | EdgeTinker</title>
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+    <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+    <meta name="theme-color" content="#2E1065">
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;

@@ -8,6 +8,7 @@
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title }} | Content Studio</title>
+    @include('components.favicons')
     @vite(['resources/css/app.css'])
 </head>
 <body class="flex min-h-screen flex-col bg-primary-50 text-neutral-900">
