@@ -5,10 +5,12 @@ use Illuminate\Support\Facades\Schedule;
 /*
 | Background work (emails, image resizing) uses the database queue.
 |
-| On Hostinger there is no long-running worker process. Instead, ONE cron job
-| runs `php artisan schedule:run` every minute, and that in turn starts a
-| queue worker which handles whatever is waiting and then exits.
-| See docs/DEPLOYMENT.md for the exact cron line.
+| There is no long-running worker process. On servers where PHP may start
+| other processes, ONE cron job runs `php artisan schedule:run` every minute
+| and the schedule below starts a queue worker that handles whatever is
+| waiting and then exits. Hostinger disables proc_open, which schedule:run
+| needs, so there the cron jobs run `queue:work --stop-when-empty …` and
+| `queue:prune-failed` directly. See docs/DEPLOYMENT.md, step 9.
 */
 Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3')
     ->everyMinute()

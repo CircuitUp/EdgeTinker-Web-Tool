@@ -103,7 +103,7 @@ While changing CSS, JavaScript or templates, run `npm run dev` for live reload. 
 
 ## Demo data and accounts
 
-`php artisan db:seed` loads 5 categories, 12 products, 3 hero slides and sample wiki pages for three products, with generated artwork labelled "PLACEHOLDER IMAGE". Product names, prices and specifications are illustrative. It is safe to re-run.
+`php artisan db:seed` loads 5 categories, 12 products, a 3-slide home banner and sample wiki pages for three products, with generated artwork labelled "PLACEHOLDER IMAGE". Product names, prices and specifications are illustrative. It is safe to re-run.
 
 Outside production it also creates a demo Content Creator with two sample submissions:
 
@@ -122,9 +122,13 @@ The demo creator is never created in production, and the Content Admin is never 
 - **Two people editing the same item:** when one change is approved, the other is flagged as out of date and its author is asked to review and resubmit.
 - **History and restore** for every item, a before/after comparison, a preview of the page as it would look live, and an audit log.
 
-Screens: Dashboard, Products, Categories, Tags, Pages (Home, Services, Contact), Wiki, Media library, My submissions; and for the admin Review queue, Messages, Users, Audit log, Site settings.
+Screens: Dashboard, Products, Categories, Tags, Pages (Home, Services, Contact), Home banner, Wiki, Media library, My submissions; and for the admin Review queue, Messages, Users, Audit log, Site settings.
 
 **Product page button.** A product that is in stock (or low stock) and has a **Store link** shows **Buy**, which opens that link in a new tab. Otherwise (out of stock, coming soon, or no store link) it shows **Send Inquiry**, which opens the contact form with the product in the subject. The store link is set on each product's form.
+
+**Home banner.** The slideshow at the top of the home page is designed visually in **Content Studio → Home banner**: drag text and buttons on a live canvas, set fonts and colours (with transparency), a solid or gradient overlay, image, video or colour backgrounds, and a separate layout for desktop, tablet and mobile. It goes through the same draft, approval and publish steps as everything else. The editor guide and developer notes are in [docs/banner-editor.md](docs/banner-editor.md).
+
+**Favicons.** Built from `resources/brand/edgetinker-mark.png` with `php artisan brand:favicons` (re-run it if the logo changes).
 
 **Partners.** The last section of the home page, just above the footer, is a strip of partner logos moving from right to left. Add, reorder or remove partners in **Pages → Home → Partners**; with none, the section is hidden. It pauses on hover and with its pause button, and stands still for visitors who ask their device for reduced motion.
 
@@ -132,6 +136,7 @@ Screens: Dashboard, Products, Categories, Tags, Pages (Home, Services, Contact),
 
 ```powershell
 php artisan test
+npm test   # checks the banner editor's CSS matches the live site's
 ```
 
 Most tests use an in-memory SQLite database. Search tests (`tests/Feature/Search`) run against the `edgetinker_test` MySQL database, because search depends on FULLTEXT indexes; MySQL must be running or those tests are skipped. If your MySQL login differs from `root` with no password, set `TEST_DB_HOST`, `TEST_DB_PORT`, `TEST_DB_DATABASE`, `TEST_DB_USERNAME` and `TEST_DB_PASSWORD`.
@@ -148,9 +153,11 @@ What is covered: the approval workflow rules, role permissions, sign-in (lockout
 | `app/Http/Controllers/Studio/Auth` | Sign-in, registration, email verification, password reset, two-factor |
 | `app/Search` | Search interface, MySQL implementation, URL filter object |
 | `app/Support` | Currency (USD/LKR), settings, page content and its field definitions, Markdown rendering, rich-text sanitiser, cache list |
+| `app/Support/Banner` | Home banner: config schema and validation, CSS generation, fonts (see docs/banner-editor.md) |
 | `resources/css/app.css` | Design tokens (colours, type scale, radius, shadow) defined once and mapped into Tailwind |
 | `resources/views/components` | Reusable Blade components: button, badge, product card, tabs, table, modal, form fields, … |
 | `resources/js/components` | Alpine.js behaviour: mega menu, slideshow, gallery, filters, search suggestions |
+| `resources/js/banner` | The banner editor (Content Studio only) and its shared CSS generator |
 | `lang/en/site.php` | Public interface text, ready for translation |
 | `config/edgetinker.php` | Default site settings (placeholder contact details) |
 | `routes/web.php`, `routes/studio.php` | Public routes; Content Studio routes |

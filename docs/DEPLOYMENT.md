@@ -12,7 +12,7 @@ Allow about an hour the first time. Updating the site afterwards takes a few min
 **How Hostinger differs from your computer**
 
 - Hostinger always serves a website from a folder called `public_html`. Laravel must only expose its `public` folder to the internet (everything else, including passwords in `.env`, stays private). Step 5 connects the two.
-- There is no always-running background process. One scheduled task (a "cron job") runs every minute and handles emails and image resizing (step 9).
+- There is no always-running background process. A scheduled task (a "cron job") runs every minute and handles emails and image resizing (step 9).
 - Screens in hPanel change from time to time. If a menu is not exactly where this guide says, use the search box in hPanel's sidebar.
 
 > Throughout this guide, replace `u123456789` with your Hostinger username and `edgetinker.com` with your domain. Your username is shown in hPanel under **Advanced → SSH Access**.
@@ -220,19 +220,28 @@ Content Creators register themselves at `https://edgetinker.com/contentcreator/r
 
 ## 9. Set up the cron job
 
-One scheduled task, running every minute, sends queued emails and resizes uploaded images.
+Two scheduled tasks. The first runs every minute: it sends queued emails and resizes uploaded images. The second runs once a day and tidies up.
+
+Hostinger switches off `proc_open`, which Laravel's usual `schedule:run` needs to start the email worker, so the worker is started directly.
 
 1. hPanel → **Advanced → Cron Jobs**.
 2. Choose type **Custom** (not PHP) if offered.
-3. Command:
+3. Every minute: enter `*` in all five boxes (minute, hour, day, month, weekday), which reads `* * * * *`, with this command:
 
    ```
-   /usr/bin/php /home/u123456789/domains/edgetinker.com/app/artisan schedule:run
+   /usr/bin/php /home/u123456789/domains/edgetinker.com/app/artisan queue:work --stop-when-empty --max-time=50 --tries=3
    ```
 
-   If `php -v` in step 7 needed a full path, use that same path here in place of `/usr/bin/php`.
-4. Schedule: every minute. In the five boxes (minute, hour, day, month, weekday) enter `*` in each, which reads `* * * * *`.
-5. Save.
+4. Once a day: minute `15`, hour `3`, and `*` in the other three boxes, with this command:
+
+   ```
+   /usr/bin/php /home/u123456789/domains/edgetinker.com/app/artisan queue:prune-failed --hours=168
+   ```
+
+   (Expired password-reset links are refused anyway; they are simply left in the database.)
+5. Save each job. If `php -v` in step 7 needed a full path, use that same path in place of `/usr/bin/php`.
+
+If you set this up earlier with `schedule:run`, delete that job and add the two above: on Hostinger it runs without errors but never sends anything.
 
 hPanel's cron form does not accept characters such as `>` or `&`, so do not add `>> /dev/null 2>&1` to the command.
 
@@ -305,7 +314,7 @@ php artisan down                 # shows a "back shortly" page to visitors
 git pull                         # fetch the new version
 composer install --no-dev --optimize-autoloader --no-scripts
 php artisan package:discover     # the step Composer cannot run itself on Hostinger
-php artisan migrate --force      # apply any database changes
+php artisan migrate --force      # apply any database changes (take a backup first, section 12)
 php artisan optimize:clear       # drop the old cached configuration and templates
 php artisan optimize             # cache the new ones
 php artisan up                   # back online
@@ -360,5 +369,8 @@ Cloud plans include SSH, and it makes everything above much easier. If you truly
 | "419 Page Expired" on every form | Cookies are not being saved: the same `http`/`https` mismatch, or the `sessions` table is missing (run `php artisan migrate --force`). |
 | Emails never arrive | Check **Site settings → Send a test email**; it shows the mail server's error. Usually the mailbox password is wrong, or `MAIL_FROM_ADDRESS` differs from `MAIL_USERNAME`. Also confirm the cron job is running (step 9), since emails are sent by it. |
 | Uploaded images stay on "Resizing queued" | The cron job is not running, or neither `gd` nor `imagick` is enabled (step 1). `php artisan queue:failed` lists jobs that failed and why. |
+| The cron job runs, but emails stay queued | The job uses `schedule:run`, which cannot start the worker on Hostinger. Use the `queue:work` command from step 9. |
+| Home banner editor: "… could not be downloaded" when choosing a font | The server could not reach Google Fonts (`fonts.googleapis.com`, `fonts.gstatic.com`). Fonts are downloaded once, then served from this site. Try again later, or choose a site font. `storage/logs` has the exact error. |
+| The browser tab still shows the old icon | Browsers keep favicons for a long time. Open the site in a private window to check; it updates by itself later. |
 | A change in `.env` has no effect | Settings are cached. Run `php artisan optimize` after every `.env` change. |
 | Locked out of the Content Admin account | Use **Forgot your password?** on the sign-in page. If two-factor codes are lost and the recovery codes too, run `php artisan tinker` and then `App\Models\User::admin()->forceFill(['two_factor_secret' => null, 'two_factor_confirmed_at' => null, 'two_factor_recovery_codes' => null])->save();` |
