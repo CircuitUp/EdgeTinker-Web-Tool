@@ -12,6 +12,7 @@
             ['Categories', 'studio.categories.index', 'layers', ['studio.categories.*'], null],
             ['Tags', 'studio.tags.index', 'filter', ['studio.tags.*'], null],
             Route::has('studio.pages.index') ? ['Pages', 'studio.pages.index', 'code', ['studio.pages.*'], null] : null,
+            Route::has('studio.banner.edit') ? ['Home banner', 'studio.banner.edit', 'layers', ['studio.banner.*'], null] : null,
             Route::has('studio.wiki.index') ? ['Wiki', 'studio.wiki.index', 'book', ['studio.wiki.*'], null] : null,
             ['Media library', 'studio.media.index', 'box', ['studio.media.*'], null],
             ['My submissions', 'studio.revisions.index', 'inbox', ['studio.revisions.*'], null],
@@ -100,7 +101,8 @@
     </aside>
 
     <main id="main" tabindex="-1" class="outline-none lg:pl-64">
-        <div class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        {{-- Screens that need the whole width (the banner editor) pass ->layoutData(['wide' => true]). --}}
+        <div @class(['w-full px-3 py-4 sm:px-4' => $wide ?? false, 'mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8' => ! ($wide ?? false)])>
             {{ $slot }}
         </div>
     </main>

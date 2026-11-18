@@ -1,6 +1,7 @@
 /* Content Studio styles: the shared design system plus the rich-text editor. */
 @import './app.css';
 @import 'trix/dist/trix.css';
+@import './banner-editor.css';
 
 @layer components {
     /* Trix editor, restyled with design-system tokens. */

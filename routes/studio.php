@@ -5,6 +5,7 @@ use App\Http\Controllers\Studio\Auth\LoginController;
 use App\Http\Controllers\Studio\Auth\PasswordResetController;
 use App\Http\Controllers\Studio\Auth\RegisterController;
 use App\Http\Controllers\Studio\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\Studio\BannerPreviewController;
 use App\Http\Controllers\Studio\PreviewController;
 use App\Livewire\Studio;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,11 @@ Route::middleware('studio')->group(function () {
     Route::livewire('/pages', Studio\Pages\Index::class)->name('pages.index');
     Route::livewire('/pages/revision/{revision}', Studio\Pages\Form::class)->whereNumber('revision')->name('pages.revision');
     Route::livewire('/pages/{page}', Studio\Pages\Form::class)->whereIn('page', ['home', 'services', 'contact'])->name('pages.edit');
+
+    // Visual editor for the home page banner.
+    Route::livewire('/banner', Studio\Banner\Editor::class)->name('banner.edit');
+    Route::livewire('/banner/revision/{revision}', Studio\Banner\Editor::class)->whereNumber('revision')->name('banner.revision');
+    Route::post('/banner/preview', BannerPreviewController::class)->middleware('throttle:60,1')->name('banner.preview');
 
     // Wiki tree manager and Markdown editor.
     Route::livewire('/wiki', Studio\Wiki\Index::class)->name('wiki.index');

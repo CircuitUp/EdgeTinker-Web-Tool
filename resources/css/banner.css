@@ -125,9 +125,15 @@
 }
 
 .bnr-btn svg {
+    display: block;
     width: 1.25rem;
     height: 1.25rem;
     flex-shrink: 0;
+}
+
+/* Buttons in the automatic column sit side by side; keep them apart. */
+.bnr-stack > .bnr-btn {
+    margin-right: 0.75rem;
 }
 
 @container bnr (min-width: 640px) {

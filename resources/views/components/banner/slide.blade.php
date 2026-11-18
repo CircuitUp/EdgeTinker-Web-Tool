@@ -26,18 +26,8 @@
     <div @class(['bnr-frame', 'bnr-frame--container' => $frame === 'container'])>
         <div class="bnr-area">
             {{-- Elements are listed in layer order, which is also the reading order. --}}
-            <div class="bnr-stack">
-                @foreach ($slide['elements'] as $item)
-                    @php $el = $item['el']; @endphp
-                    @if ($el['type'] === 'button')
-                        <a href="{{ $el['href'] }}" class="bnr-el bnr-btn" style="{{ $item['style'] }}"
-                           @if ($el['newTab']) target="_blank" rel="noopener" @endif>{{ $el['content'] }}@if ($el['icon'] !== 'none') <x-icon :name="$el['icon']" />@endif
-                            @if ($el['newTab'])<span class="sr-only">{{ __('site.nav.new_tab') }}</span>@endif</a>
-                    @else
-                        <{{ $el['tag'] }} class="bnr-el bnr-text" style="{{ $item['style'] }}">{{ $el['content'] }}</{{ $el['tag'] }}>
-                    @endif
-                @endforeach
-            </div>
+            {{-- Joined without whitespace, exactly like the editor's x-for: spaces between buttons on one line would otherwise differ. --}}
+            <div class="bnr-stack">{!! collect($slide['elements'])->map(fn (array $item) => trim(view('components.banner.element', ['item' => $item])->render()))->implode('') !!}</div>
         </div>
     </div>
 @else
@@ -51,8 +41,8 @@
     <div class="bnr-overlay" aria-hidden="true"></div>
     <div class="bnr-scrim" x-show="config.scrim" aria-hidden="true"></div>
 
-    <div class="bnr-frame" :class="config.frame === 'container' && 'bnr-frame--container'" x-ref="frame">
-        <div class="bnr-area" x-ref="area">
+    <div class="bnr-frame" :class="config.frame === 'container' && 'bnr-frame--container'">
+        <div class="bnr-area">
             <div class="bnr-stack">
                 <template x-for="(el, layer) in s.elements" :key="el.id">
                     <div :class="[el.type === 'button' ? 'bnr-el bnr-btn' : 'bnr-el bnr-text', { 'is-hover': el.type === 'button' && hoverPreview && selectedId === el.id, 'is-selected': selectedId === el.id, 'is-locked': el.locked }]"

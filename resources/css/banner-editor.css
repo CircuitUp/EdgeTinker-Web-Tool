@@ -1,0 +1,288 @@
+/* ==========================================================================
+   Banner editor (Content Studio → Home banner). Studio only.
+   The banner itself is styled by banner.css, shared with the live site.
+   ========================================================================== */
+.be-canvas {
+    user-select: none;
+    touch-action: none;
+}
+
+.be-canvas .bnr-el {
+    cursor: move;
+}
+
+.be-canvas .bnr-el.is-locked {
+    cursor: default;
+}
+
+.be-canvas .bnr-el:hover:not(.is-selected) {
+    outline: 1px dashed rgb(255 255 255 / 0.7);
+    outline-offset: 2px;
+}
+
+.be-canvas .bnr-content[contenteditable='true'],
+.be-canvas .bnr-content[contenteditable='plaintext-only'] {
+    cursor: text;
+    user-select: text;
+    outline: 2px solid #22d3ee;
+    outline-offset: 2px;
+}
+
+/* Selection box and handles (sizes undo the canvas zoom so they stay easy to grab). */
+.be-select {
+    outline: calc(2px * var(--be-inv, 1)) solid #22d3ee;
+    outline-offset: calc(2px * var(--be-inv, 1));
+}
+
+.be-select.is-locked {
+    outline-style: dashed;
+    outline-color: #94a3b8;
+}
+
+.be-handle,
+.be-rotate {
+    position: absolute;
+    width: calc(14px * var(--be-inv, 1));
+    height: calc(14px * var(--be-inv, 1));
+    background: #ffffff;
+    border: calc(2px * var(--be-inv, 1)) solid #0891b2;
+    border-radius: 3px;
+    touch-action: none;
+}
+
+.be-handle--w,
+.be-handle--e {
+    top: 50%;
+    cursor: ew-resize;
+    transform: translateY(-50%);
+}
+
+.be-handle--w {
+    left: calc(-9px * var(--be-inv, 1));
+}
+
+.be-handle--e {
+    right: calc(-9px * var(--be-inv, 1));
+}
+
+.be-rotate {
+    left: 50%;
+    top: calc(-34px * var(--be-inv, 1));
+    border-radius: 999px;
+    cursor: grab;
+    transform: translateX(-50%);
+}
+
+.be-rotate::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    height: calc(18px * var(--be-inv, 1));
+    border-left: calc(2px * var(--be-inv, 1)) solid #0891b2;
+}
+
+/* Guides: centre lines and safe area (dashed), your guides (cyan), smart guides (magenta). */
+.be-guide-center {
+    border-left: calc(1px * var(--be-inv, 1)) dashed rgb(34 211 238 / 0.8);
+}
+
+.be-guide-center--h {
+    border-left: 0;
+    border-top: calc(1px * var(--be-inv, 1)) dashed rgb(34 211 238 / 0.8);
+}
+
+.be-safe {
+    border: calc(1px * var(--be-inv, 1)) dashed rgb(255 255 255 / 0.55);
+}
+
+.be-guide {
+    width: calc(9px * var(--be-inv, 1));
+    margin-left: calc(-4px * var(--be-inv, 1));
+    background: linear-gradient(90deg, transparent 45%, #06b6d4 45%, #06b6d4 55%, transparent 55%);
+}
+
+.be-guide--h {
+    width: auto;
+    height: calc(9px * var(--be-inv, 1));
+    margin-left: 0;
+    margin-top: calc(-4px * var(--be-inv, 1));
+    background: linear-gradient(180deg, transparent 45%, #06b6d4 45%, #06b6d4 55%, transparent 55%);
+}
+
+.be-smart {
+    border-left: calc(1px * var(--be-inv, 1)) solid #ff00c8;
+}
+
+.be-smart--h {
+    border-left: 0;
+    border-top: calc(1px * var(--be-inv, 1)) solid #ff00c8;
+}
+
+.be-smart-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0 4px;
+    border-radius: 3px;
+    background: #ff00c8;
+    color: #ffffff;
+    font: 600 11px/1.5 var(--et-font-sans);
+    white-space: nowrap;
+    transform: scale(var(--be-inv, 1));
+    transform-origin: 0 0;
+}
+
+/* Hidden full-size copies used to check each screen size. */
+.be-measure {
+    position: fixed;
+    left: -100000px;
+    top: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Transparency checkerboard. */
+.be-checker {
+    background-color: #ffffff;
+    background-image: linear-gradient(45deg, #d4d4d8 25%, transparent 25%), linear-gradient(-45deg, #d4d4d8 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #d4d4d8 75%), linear-gradient(-45deg, transparent 75%, #d4d4d8 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+}
+
+/* Colour picker parts. */
+.be-sv {
+    position: relative;
+    height: 9rem;
+    border-radius: 6px;
+    background-image: linear-gradient(to top, #000000, transparent), linear-gradient(to right, #ffffff, transparent);
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.be-sv-dot,
+.be-pad-dot {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px rgb(15 23 42 / 0.6);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.be-hue,
+.be-alpha {
+    height: 14px;
+    border-radius: 999px;
+    appearance: none;
+}
+
+.be-hue {
+    background: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+.be-alpha {
+    background: linear-gradient(90deg, var(--from), var(--to));
+}
+
+.be-hue::-webkit-slider-thumb,
+.be-alpha::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: 0 0 0 1px rgb(15 23 42 / 0.7);
+}
+
+.be-hue::-moz-range-thumb,
+.be-alpha::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: 0 0 0 1px rgb(15 23 42 / 0.7);
+}
+
+/* Gradient stops on the bar. */
+.be-stop {
+    position: absolute;
+    top: -1.6rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 2px;
+    border: 2px solid #64748b;
+    border-radius: 4px;
+    background: #ffffff;
+    transform: translateX(-50%);
+    cursor: ew-resize;
+    touch-action: none;
+}
+
+.be-stop::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    border: 5px solid transparent;
+    border-top-color: #64748b;
+    transform: translateX(-50%);
+}
+
+.be-stop.is-active {
+    border-color: #6d28d9;
+    box-shadow: 0 0 0 2px #ede9fe;
+}
+
+.be-stop.is-active::after {
+    border-top-color: #6d28d9;
+}
+
+/* Angle dial and centre pad. */
+.be-dial {
+    position: relative;
+    width: 4rem;
+    height: 4rem;
+    flex-shrink: 0;
+    border: 2px solid #64748b;
+    border-radius: 999px;
+    background: #f8fafc;
+    cursor: grab;
+    touch-action: none;
+}
+
+.be-dial-hand {
+    position: absolute;
+    left: calc(50% - 1px);
+    top: 4px;
+    width: 2px;
+    height: calc(50% - 4px);
+    background: #6d28d9;
+    transform-origin: 50% 100%;
+}
+
+.be-dial-hand::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #6d28d9;
+}
+
+.be-pad {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border: 1px solid #64748b;
+    border-radius: 6px;
+    background: linear-gradient(#e2e8f0 1px, transparent 1px) 0 0 / 25% 25%, linear-gradient(90deg, #e2e8f0 1px, transparent 1px) 0 0 / 25% 25%, #f8fafc;
+    cursor: crosshair;
+    touch-action: none;
+}

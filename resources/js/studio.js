@@ -7,11 +7,13 @@
  */
 import 'trix';
 import tabs from './components/tabs';
+import bannerEditor from './banner/editor';
 
 document.addEventListener('alpine:init', () => {
     const Alpine = window.Alpine;
 
     Alpine.data('tabs', tabs);
+    Alpine.data('bannerEditor', bannerEditor);
 
     Alpine.store('toasts', {
         items: [],
