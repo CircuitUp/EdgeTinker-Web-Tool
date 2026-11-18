@@ -121,10 +121,12 @@
         <button type="button" class="{{ $btn }} text-danger" @click="removeSlide()" :disabled="config.slides.length <= 1">Delete slide</button>
     </div>
 
-    <div class="grid gap-3 xl:grid-cols-[16rem_minmax(0,1fr)_20rem]">
+    {{-- Narrow screens: canvas, layers, inspector stacked. Laptops: canvas and inspector side by side, layers under the canvas. Wide screens: three columns. --}}
+    <div class="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_20rem] 2xl:grid-cols-[16rem_minmax(0,1fr)_20rem]">
 
+        <div class="flex min-w-0 flex-col gap-3 2xl:contents">
         {{-- ── Layers ─────────────────────────────────────────────────────── --}}
-        <section class="order-2 flex flex-col rounded-card border border-neutral-200 bg-white shadow-card xl:order-1" aria-labelledby="be-layers">
+        <section class="order-2 flex flex-col rounded-card border border-neutral-200 bg-white shadow-card 2xl:col-start-1 2xl:row-start-1" aria-labelledby="be-layers">
             <div class="flex items-center justify-between px-3 pt-3">
                 <h2 id="be-layers" class="{{ $h3 }}">Layers</h2>
                 <span class="text-sm text-neutral-600" x-text="`${s.elements.length} / ${limits.elements}`"></span>
@@ -191,7 +193,7 @@
         </section>
 
         {{-- ── Canvas ─────────────────────────────────────────────────────── --}}
-        <section class="order-1 min-w-0 xl:order-2" aria-label="Banner canvas">
+        <section class="order-1 min-w-0 2xl:col-start-2 2xl:row-start-1" aria-label="Banner canvas">
             <div x-ref="stage" class="relative overflow-auto rounded-card border border-neutral-200 bg-neutral-200 p-2"
                  tabindex="0" aria-label="Banner canvas. Choose an element in Layers, then use the arrow keys to move it.">
                 <div class="relative inline-block align-top" :style="show.rulers ? 'padding: 24px 0 0 24px' : ''">
@@ -277,8 +279,10 @@
             </p>
         </section>
 
+        </div>
+
         {{-- ── Inspector ──────────────────────────────────────────────────── --}}
-        <aside class="order-3 rounded-card border border-neutral-200 bg-white shadow-card" aria-labelledby="be-inspector" data-no-nudge>
+        <aside class="rounded-card border border-neutral-200 bg-white shadow-card 2xl:col-start-3 2xl:row-start-1" aria-labelledby="be-inspector" data-no-nudge>
             <h2 id="be-inspector" class="px-4 pt-4 text-lg font-semibold text-neutral-900"
                 x-text="selected ? (selected.type === 'button' ? 'Button' : 'Text') : (selectedId === 'overlay' ? 'Overlay' : 'Banner and background')"></h2>
 
